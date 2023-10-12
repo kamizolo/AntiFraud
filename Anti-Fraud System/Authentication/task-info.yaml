@@ -1,0 +1,2601 @@
+type: edu
+files:
+  - name: src/antifraud/AntiFraudApplication.java
+    visible: true
+    text: |+
+      package antifraud;
+      
+      import org.springframework.boot.SpringApplication;
+      import org.springframework.boot.autoconfigure.SpringBootApplication;
+      
+      
+      @SpringBootApplication
+      public class AntiFraudApplication {
+          public static void main(String[] args) {
+              SpringApplication.run(AntiFraudApplication.class, args);
+          }
+      }
+    
+    learner_created: false
+  - name: src/resources/application.properties
+    visible: true
+    text: |-
+      server.port=28852
+      server.error.include-message=always
+      management.endpoints.web.exposure.include=*
+      management.endpoint.shutdown.enabled=true
+      spring.jackson.serialization.INDENT_OUTPUT=true
+      
+      # Setup for the H2 console for viewing data in the database
+      spring.h2.console.enabled=true
+      spring.h2.console.path=/h2
+      
+      # H2 data source setup
+      spring.datasource.username=sa
+      spring.datasource.password=
+      spring.datasource.url=jdbc:h2:file:../service_db
+      spring.datasource.driverClassName=org.h2.Driver
+      spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+      
+      # Automatically update tables when persistence objects have changed
+      spring.jpa.hibernate.ddl-auto=update
+    learner_created: false
+  - name: build.gradle
+    visible: true
+    text: |-
+      plugins {
+          id 'java'
+          id 'org.springframework.boot' version '2.7.4'
+          id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+      }
+      
+      
+      repositories {
+          mavenCentral()
+      }
+      
+      sourceSets.main.resources.srcDirs = ["src/resources"]
+      
+      test {
+          jvmArgs = ["--add-opens", "java.base/java.lang=ALL-UNNAMED"]
+      }
+      
+      dependencies {
+          implementation 'org.springframework.boot:spring-boot-starter'
+          implementation 'org.springframework.boot:spring-boot-starter-actuator'
+          implementation 'org.springframework.boot:spring-boot-starter-web'
+          implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+          implementation 'org.springframework.boot:spring-boot-starter-security'
+          implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+          implementation 'com.h2database:h2'
+          implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.0.Final'
+      }
+    learner_created: false
+  - name: src/resources/banner.txt
+    visible: true
+    text: |2-
+       __    __   __          __    __       _______. __
+      |  |  |  | |  |        |  |  |  |     /       ||  |
+      |  |__|  | |  |        |  |__|  |    |   (----`|  |
+      |   __   | |  |        |   __   |     \   \    |  |
+      |  |  |  | |  |  __    |  |  |  | .----)   |   |__|
+      |__|  |__| |__| (_ )   |__|  |__| |_______/    (__)
+      lorenzo
+    learner_created: false
+  - name: src/resources/static/index.html
+    visible: true
+    text: |-
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <title>Main</title>
+      </head>
+      <body>
+      <h1>Welcome!</h1>
+      </body>
+      </html>
+    learner_created: false
+  - name: src/antifraud/User/User.java
+    visible: true
+    text: |-
+      package antifraud.User;
+      
+      import com.fasterxml.jackson.annotation.JsonIgnore;
+      
+      import javax.persistence.*;
+      
+      
+      @Entity
+      @Table(name = "users")
+      public class User {
+          @Id
+          @GeneratedValue
+          private long id;
+      
+          @Column(name = "username")
+          private String username;
+      
+          @Column(name = "name")
+          private String name;
+          @JsonIgnore
+          @Column(name = "password")
+          private String password;
+          @JsonIgnore
+          @Column(name = "authority")
+          private String authority;
+      
+          public User() {
+          }
+      
+          public User(long id, String name, String username, String password, String authority) {
+              this.id = id;
+              this.username = username;
+              this.name = name;
+              this.password = password;
+              this.authority = authority;
+      
+          }
+      
+          // getters and setters
+      
+      
+          public long getId() {
+              return id;
+          }
+      
+          public void setId(long id) {
+              this.id = id;
+          }
+      
+          public String getUsername() {
+              return username;
+          }
+      
+          public void setUsername(String username) {
+              this.username = username;
+          }
+      
+          public String getName() {
+              return name;
+          }
+      
+          public void setName(String name) {
+              this.name = name;
+          }
+      
+          public String getPassword() {
+              return password;
+          }
+      
+          public void setPassword(String password) {
+              this.password = password;
+          }
+      
+          public String getAuthority() {
+              return authority;
+          }
+      
+          public void setAuthority(String authority) {
+              this.authority = authority;
+          }
+      }
+    learner_created: false
+  - name: src/antifraud/Security/RestAuthenticationEntryPoint.java
+    visible: true
+    text: |
+      package antifraud.Security;
+      
+      import org.springframework.security.core.AuthenticationException;
+      import org.springframework.security.web.AuthenticationEntryPoint;
+      
+      import javax.servlet.ServletException;
+      import javax.servlet.http.HttpServletRequest;
+      import javax.servlet.http.HttpServletResponse;
+      import java.io.IOException;
+      
+      public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+      
+          @Override
+          public void commence(HttpServletRequest request,
+                               HttpServletResponse response,
+                               AuthenticationException authException) throws IOException, ServletException {
+              response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+          }
+      }
+    learner_created: false
+  - name: src/antifraud/Security/SecurityConfig.java
+    visible: true
+    text: |-
+      package antifraud.Security;
+      
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.boot.jdbc.DataSourceBuilder;
+      import org.springframework.context.annotation.Bean;
+      import org.springframework.context.annotation.Configuration;
+      import org.springframework.http.HttpMethod;
+      import org.springframework.security.config.Customizer;
+      import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+      import org.springframework.security.config.http.SessionCreationPolicy;
+      import org.springframework.security.core.userdetails.User;
+      import org.springframework.security.core.userdetails.UserDetails;
+      import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+      import org.springframework.security.crypto.password.PasswordEncoder;
+      import org.springframework.security.provisioning.JdbcUserDetailsManager;
+      import org.springframework.security.provisioning.UserDetailsManager;
+      import org.springframework.security.web.SecurityFilterChain;
+      
+      import javax.sql.DataSource;
+      
+      @Configuration
+      public class SecurityConfig {
+      /*
+          @Bean
+          public UserDetailsService userDetailsService() {
+              UserDetails user1 = User.withUsername("user1")
+                      .password(this.passwordEncoder().encode("pass1"))
+                      .roles()
+                      .build();
+              UserDetails user2 = User.withDefaultPasswordEncoder()
+                      .username("user2")
+                      .password("pass2")
+                      .roles()
+                      .build();
+      
+              return new InMemoryUserDetailsManager(user1, user2);
+          }*/
+      
+          //RestAuthenticationEntryPoint restAuthenticationEntryPoint = new RestAuthenticationEntryPoint();
+          @Bean
+          public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+      
+      
+              return http
+                      .httpBasic(Customizer.withDefaults())
+                      .csrf().disable()                           // For modifying requests via Postman
+                     /* .exceptionHandling(handing -> handing
+                              .authenticationEntryPoint(restAuthenticationEntryPoint) // Handles auth error
+                      )*/
+                      .headers(headers -> headers.frameOptions().disable())           // for Postman, the H2 console
+                      .authorizeHttpRequests(requests -> requests                     // manage access
+                                      .antMatchers(HttpMethod.POST, "/api/auth/user").permitAll()
+                                      .antMatchers(HttpMethod.GET, "/api/auth/list").permitAll()
+                                      .antMatchers("/actuator/shutdown").permitAll()      // needs to run test
+                                      .antMatchers(HttpMethod.GET, "/test").hasRole("USER")
+                                      .antMatchers("/h2-console/**").permitAll()
+                                      .antMatchers(HttpMethod.DELETE, "/api/auth/user/*").authenticated()
+      
+                              // other matchers
+                      )
+                      .sessionManagement(session -> session
+                              .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no session
+                      )
+                      // other configurations
+                      .build();
+          }
+      
+      
+          @Bean
+          public PasswordEncoder passwordEncoder() {
+              return new BCryptPasswordEncoder();
+          }
+      
+      
+      /*
+          @Bean
+          public DataSource dataSource()
+          {
+              DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+              dataSourceBuilder.driverClassName("org.h2.Driver");
+              dataSourceBuilder.url("jdbc:h2:file:C:/temp/test");
+              dataSourceBuilder.username("sa");
+              dataSourceBuilder.password("");
+              return dataSourceBuilder.build();
+          }
+      
+      
+          @Bean
+          public UserDetailsManager users(DataSource dataSource) {
+              JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
+              users.
+              users.createUser();
+              return users;
+          }
+      */
+      }
+    learner_created: false
+  - name: src/antifraud/Rest/UserController.java
+    visible: true
+    text: |-
+      package antifraud.Rest;
+      
+      import antifraud.User.CRUD.AppUserRepository;
+      import antifraud.User.Dao.DbUserDao;
+      import antifraud.User.User;
+      import antifraud.User.Dao.UserDao;
+      import com.fasterxml.jackson.core.JsonProcessingException;
+      import com.fasterxml.jackson.databind.ObjectMapper;
+      import org.springframework.http.HttpStatus;
+      import org.springframework.http.ResponseEntity;
+      import org.springframework.security.core.authority.SimpleGrantedAuthority;
+      import org.springframework.security.crypto.password.PasswordEncoder;
+      import org.springframework.web.bind.annotation.*;
+      
+      import java.util.List;
+      
+      @RestController
+      public class UserController {
+      
+          private final AppUserRepository repository;
+          private final PasswordEncoder passwordEncoder;
+      
+          public UserController(AppUserRepository repository,
+                                PasswordEncoder passwordEncoder) {
+              this.repository = repository;
+              this.passwordEncoder = passwordEncoder;
+          }
+      
+          UserDao userDao = new DbUserDao();
+      
+          @PostMapping(path = "/api/auth/user")
+          public ResponseEntity<String> register(@RequestBody RegistrationRequest request) {
+      
+              //Field Missing
+              if (request.username() == null || request.username().isBlank())
+                  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+              else if (request.name() == null || request.name().isBlank())
+                  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+              else if (request.password() == null || request.password().isBlank())
+                  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      
+      
+              User user = userDao.findByUsername(request.username());
+              //User already in DB
+              if(user == null) {
+                  user = new User();
+      
+                  user.setUsername(request.username());
+                  user.setName(request.name());
+                  user.setPassword(passwordEncoder.encode(request.password()));
+                  user.setAuthority(String.valueOf(new SimpleGrantedAuthority("ROLE_USER")));
+      
+                  userDao.add(user);
+              } else {
+                  return new ResponseEntity<>(HttpStatus.CONFLICT);
+              }
+      
+      
+      
+              /*
+              //old CRUD
+              if (repository.findAppUserByUsername(request.username()).isPresent()) {
+      
+                  return new ResponseEntity<>(HttpStatus.CONFLICT);
+              }
+              //Field Missing
+              if (request.username() == null || request.username().isBlank())
+                  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+              else if (request.name() == null || request.name().isBlank())
+                  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+              else if (request.password() == null || request.password().isBlank())
+                  return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+              var user = new User();
+      
+              user.setUsername(request.username());
+              user.setName(request.name());
+              user.setPassword(passwordEncoder.encode(request.password()));
+              user.setAuthority(String.valueOf(new SimpleGrantedAuthority("ROLE_USER")));
+      
+      
+      
+              //repository.save(user);
+              userDao.add(user);
+      */
+              return new ResponseEntity<>("New user successfully registered", HttpStatus.CREATED);
+      
+      
+          }
+          @GetMapping(path = "/api/auth/list")
+          public ResponseEntity<String>  list() throws JsonProcessingException {
+      
+              List<User> users = userDao.findAll();
+              //Iterable<User> users = repository.findAll(); //CRUD
+              ObjectMapper objectMapper = new ObjectMapper();
+              StringBuilder output = new StringBuilder();
+      
+              for (User u : users) {
+                  output.append(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(u));
+              }
+      
+              return new ResponseEntity<>(output.toString(), HttpStatus.OK);
+          }
+      
+          @DeleteMapping(path = "/api/auth/user/{username}")
+          public ResponseEntity<String> delete(@PathVariable String username) {
+      
+      
+              User deleting = userDao.findByUsername(username);
+              if (deleting == null) {
+                  return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+              }
+              else {
+                  userDao.deleteById(deleting.getId());
+              }
+      
+      
+      /*
+              //old CRUD
+      
+              if (repository.findAppUserByUsername(username).isEmpty()) {
+                  return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+              }
+              else {
+                  userDao.deleteById(repository.findAppUserByUsername(username).get().getId());
+                  repository.delete(repository.findAppUserByUsername(username).get());
+              }
+              */
+              return new ResponseEntity<>(HttpStatus.OK);
+          }
+      
+          @GetMapping(path = "/test")
+          public String test() {
+              return "Access to '/test' granted";
+          }
+      
+          record RegistrationRequest(String username, String name, String password, String authority) { }
+      }
+    learner_created: false
+  - name: src/antifraud/User/Dao/UserDao.java
+    visible: true
+    text: |-
+      package antifraud.User.Dao;
+      
+      import antifraud.User.User;
+      
+      import java.util.List;
+      
+      public interface UserDao {
+          List<User> findAll();
+          User findById(long id);
+          void add(User user);
+          void update(User user);
+          void deleteById(long id);
+      
+          User findByUsername(String username);
+      }
+    learner_created: false
+  - name: src/antifraud/User/Dao/DbUserDao.java
+    visible: true
+    text: |
+      package antifraud.User.Dao;
+      
+      import antifraud.DB.DbClient;
+      import antifraud.User.User;
+      import org.h2.jdbcx.JdbcDataSource;
+      import org.springframework.boot.autoconfigure.batch.BatchDataSource;
+      
+      import java.sql.Connection;
+      import java.sql.Statement;
+      import java.util.List;
+      
+      public class DbUserDao implements UserDao {
+      
+      
+          private static final String CREATE_DB = "CREATE TABLE IF NOT EXISTS USERS(" +
+                  "id INTEGER PRIMARY KEY AUTO_INCREMENT, " +
+                  "name VARCHAR(255) NOT NULL, " +
+                  "username VARCHAR(255) UNIQUE NOT NULL, " +
+                  "password VARCHAR(255) NOT NULL, " +
+                  "authority VARCHAR(255) NOT NULL);";
+      
+          private static final String SELECT_ALL = "SELECT * FROM USERS";
+          private static final String SELECT_BY_ID = "SELECT * FROM USERS WHERE id = %d";
+          private static final String SELECT_BY_USERNAME = "SELECT * FROM USERS WHERE username = '%s'";
+          private static final String INSERT_DATA = "INSERT INTO USERS (name, username, password, authority) VALUES  ('%s' , '%s' , '%s' , '%s')";
+          private static final String UPDATE_DATA = "UPDATE USERS SET name " +
+                  "= '%s' WHERE id = %d";
+          private static final String DELETE_DATA = "DELETE FROM USERS WHERE id = %d";
+      
+          private final DbClient dbClient;
+      
+          public DbUserDao() {
+              JdbcDataSource ds = new JdbcDataSource();
+              ds.setURL("jdbc:h2:file:../service_db");
+              ds.setUser("sa");
+              ds.setPassword("");
+              dbClient = new DbClient(ds);
+              dbClient.run(CREATE_DB);
+              System.out.println("user data structure create");
+          }
+      
+          @Override
+          public void add(User user) {
+              dbClient.run(String.format(
+                      INSERT_DATA, user.getName(), user.getUsername(), user.getPassword(), user.getAuthority()));
+              System.out.println("user: Id " + user.getId() +
+                      ", username: " + user.getUsername() + " added");
+          }
+      
+          @Override
+          public List<User> findAll() {
+              return dbClient.selectForList(SELECT_ALL);
+          }
+      
+          @Override
+          public User findById(long id) {
+              User user = dbClient.select(String.format(SELECT_BY_ID, id));
+      
+              if (user != null) {
+                  System.out.println("user: Id " + id + ", found");
+                  return user;
+              } else {
+                  System.out.println("user: Id " + id + ", not found");
+                  return null;
+              }
+          }
+      
+          public User findByUsername(String username) {
+              User user = dbClient.select(String.format(SELECT_BY_USERNAME, username));
+      
+              if (user != null) {
+                  System.out.println("user: " + username + ", found");
+                  return user;
+              } else {
+                  System.out.println("user: " + username + ", not found");
+                  return null;
+              }
+          }
+      
+          @Override
+          public void update(User user) {
+              dbClient.run(String.format(
+                      UPDATE_DATA, user.getName(), user.getId()));
+              System.out.println("Developer: Id " + user.getId() + ", updated");
+          }
+      
+          @Override
+          public void deleteById(long id) {
+              dbClient.run(String.format(DELETE_DATA, id));
+              System.out.println("user: Id " + id + ", deleted");
+          }
+      }
+    learner_created: false
+  - name: src/antifraud/DB/DbClient.java
+    visible: true
+    text: |-
+      package antifraud.DB;
+      
+      import antifraud.User.User;
+      
+      import javax.sql.DataSource;
+      import java.sql.*;
+      import java.util.ArrayList;
+      import java.util.List;
+      
+      public class DbClient {
+          static final String JDBC_DRIVER = "org.h2.Driver";
+          private static final String CONNECTION_URL = "jdbc:h2:file:../service_db";
+          static final String DB_URL = "jdbc:h2:C:\\Users\\Lorenzo\\AppData\\Local\\Temp\\Anti-Fraud System\\Anti-Fraud System\\task\\src\\antifraud\\DB";
+      
+          private final DataSource dataSource;
+      
+          public DbClient(DataSource dataSource) {
+              this.dataSource = dataSource;
+          }
+      
+          public void run(String str) {
+              Connection conn = null;
+              Statement stmt = null;
+              try /*(Connection con = dataSource.getConnection(); // Statement creation
+                   Statement statement = con.createStatement()
+              ) */{
+      
+                  Class.forName(JDBC_DRIVER);
+                  conn = DriverManager.getConnection(DB_URL);
+                  dataSource.getConnection();
+                  //STEP 3: Execute a query
+                  stmt = conn.createStatement();
+                  stmt.executeUpdate(str);
+      
+                  conn.setAutoCommit(true);
+                  stmt.close();
+                  conn.close();
+      
+                  //statement.executeUpdate(str); // Statement execution
+              } catch (SQLException e) {
+                  e.printStackTrace();
+              } catch (ClassNotFoundException e) {
+                  throw new RuntimeException(e);
+              }
+          }
+      
+          public User select(String query) {
+              List<User> users = selectForList(query);
+              if (users.size() == 1) {
+                  return users.get(0);
+              } else if (users.isEmpty()) {
+                  return null;
+              } else {
+                  throw new IllegalStateException("Query returned more than one object");
+              }
+          }
+      
+          public List<User> selectForList(String query) {
+              List<User> users = new ArrayList<>();
+              Connection conn = null;
+              Statement stmt = null;
+      
+              try {
+                  Class.forName(JDBC_DRIVER);
+                  conn = DriverManager.getConnection(DB_URL);
+      
+                  //STEP 3: Execute a query
+                  stmt = conn.createStatement();
+                  ResultSet resultSetItem = stmt.executeQuery(query);
+      
+                  while (resultSetItem.next()) {
+                      // Retrieve column values
+                      int id = resultSetItem.getInt("id");
+                      String name = resultSetItem.getString("name");
+                      String username = resultSetItem.getString("username");
+                      String password = resultSetItem.getString("password");
+                      String authority = resultSetItem.getString("authority");
+      
+                      User user = new User(id, name ,username, password,authority);
+                      users.add(user);
+                  }
+      
+                  return users;
+              } catch (SQLException | ClassNotFoundException e) {
+                  e.printStackTrace();
+              }
+      
+              return users;
+          }
+      }
+    learner_created: false
+  - name: src/antifraud/User/DB/DBUserDetailsService.java
+    visible: true
+    text: |+
+      package antifraud.User.DB;
+      
+      import antifraud.User.User;
+      import org.springframework.beans.factory.annotation.Autowired;
+      import org.springframework.security.core.userdetails.UserDetails;
+      import org.springframework.security.core.userdetails.UserDetailsService;
+      import org.springframework.security.core.userdetails.UsernameNotFoundException;
+      import org.springframework.stereotype.Service;
+      
+      @Service
+      public class DBUserDetailsService implements UserDetailsService {
+      
+              @Autowired
+              private UserRepository userRepository;
+      
+              @Override
+              public UserDetails loadUserByUsername(String username) {
+                  User user = userRepository.findByUsername(username);
+                  if (user == null) {
+                      throw new UsernameNotFoundException(username);
+                  }
+                  return new MyUserAdapter(user);
+              }
+      
+      }
+    
+    learner_created: false
+  - name: src/antifraud/User/CRUD/AppUserAdapter.java
+    visible: true
+    text: |-
+      package antifraud.User.CRUD;
+      
+      import antifraud.User.User;
+      import org.springframework.security.core.GrantedAuthority;
+      import org.springframework.security.core.authority.SimpleGrantedAuthority;
+      import org.springframework.security.core.userdetails.UserDetails;
+      
+      import java.util.Collection;
+      import java.util.List;
+      
+      public class AppUserAdapter implements UserDetails {
+          private final User user;
+      
+          public AppUserAdapter(User user) {
+              this.user = user;
+          }
+      
+          @Override
+          public Collection<? extends GrantedAuthority> getAuthorities() {
+              return List.of(new SimpleGrantedAuthority(user.getAuthority()));
+          }
+      
+          @Override
+          public String getPassword() {
+              return user.getPassword();
+          }
+      
+          @Override
+          public String getUsername() {
+              return user.getUsername();
+          }
+      
+          @Override
+          public boolean isAccountNonExpired() {
+              return true;
+          }
+      
+          @Override
+          public boolean isAccountNonLocked() {
+              return true;
+          }
+      
+          @Override
+          public boolean isCredentialsNonExpired() {
+              return true;
+          }
+      
+          @Override
+          public boolean isEnabled() {
+              return true;
+          }
+      }
+    learner_created: false
+  - name: src/antifraud/User/CRUD/AppUserDetailsServiceImpl.java
+    visible: true
+    text: |-
+      package antifraud.User.CRUD;
+      
+      import org.springframework.security.core.userdetails.UserDetails;
+      import org.springframework.security.core.userdetails.UserDetailsService;
+      import org.springframework.security.core.userdetails.UsernameNotFoundException;
+      import org.springframework.stereotype.Service;
+      /*
+      @Service
+      public class AppUserDetailsServiceImpl implements UserDetailsService {
+          private final AppUserRepository repository;
+      
+          public AppUserDetailsServiceImpl(AppUserRepository repository) {
+              this.repository = repository;
+          }
+      
+          @Override
+          public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+              User user = repository
+                      .findAppUserByUsername(username)
+                      .orElseThrow(() -> new UsernameNotFoundException("Not found"));
+      
+              return new AppUserAdapter(user);
+          }
+      
+      }
+      */
+    learner_created: false
+  - name: src/antifraud/User/CRUD/AppUserRepository.java
+    visible: true
+    text: |-
+      package antifraud.User.CRUD;
+      
+      import antifraud.User.User;
+      import org.springframework.data.repository.CrudRepository;
+      import java.util.Optional;
+      
+      public interface AppUserRepository extends CrudRepository<User, Long> {
+          Optional<User> findAppUserByUsername(String username);
+      
+      }
+    learner_created: false
+  - name: src/antifraud/User/DB/UserRepository.java
+    visible: true
+    text: |-
+      package antifraud.User.DB;
+      
+      import antifraud.User.User;
+      import org.springframework.data.jpa.repository.JpaRepository;
+      
+      public interface UserRepository extends JpaRepository<User, Long> {
+      
+          User findByUsername(String username);
+      }
+    learner_created: false
+  - name: src/antifraud/DB.mv.db
+    visible: true
+    text: "H:2,block:6,blockSize:1000,chunk:1c,clean:1,created:18a97c03a92,format:2,version:1c,fletcher:84c41902\n\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0H:2,block:6,blockSize:1000,chunk:1c,clean:1,created:18a97c03a92,format:2,version:1c,fletcher:84c41902\n\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0chunk:19,block:2,len:1,map:1a,max:e40,next:3,pages:5,root:640000253d2,time:9737b,version:19,toc:bca\
+    \                                                                           \n\
+    \0\0\x04\x03\x04�\0\x05\b\0\x01\x02\x03\x04\x05\x06\a\b\0! &XSET CREATE_BUILD\
+    \ 214\" \"\n2CREATE USER IF NOT EXISTS \"\" SALT '' HASH '' ADMIN#  \n�\x02CREATE\
+    \ CACHED TABLE \"PUBLIC\".\"USERS\"(\n    \"ID\" INTEGER GENERATED BY DEFAULT\
+    \ AS IDENTITY SEQUENCE \"PUBLIC\".\"SYSTEM_SEQUENCE_E2E24BE9_6A93_4880_A00A_2DB54F7E28C1\"\
+    \ NOT NULL,\n    \"NAME\" CHARACTER VARYING(255) NOT NULL,\n    \"USERNAME\" CHARACTER\
+    \ VARYING(255) NOT NULL,\n    \"PASSWORD\" CHARACTER VARYING(255) NOT NULL,\n\
+    \    \"AUTHORITY\" CHARACTER VARYING(255) NOT NULL\n)$ #\n�\x01CREATE SEQUENCE\
+    \ \"PUBLIC\".\"SYSTEM_SEQUENCE_E2E24BE9_6A93_4880_A00A_2DB54F7E28C1\" AS INTEGER\
+    \ START WITH 1 RESTART WITH 37 BELONGS_TO_TABLE% !\nECREATE PRIMARY KEY \"PUBLIC\"\
+    .\"PRIMARY_KEY_4\" ON \"PUBLIC\".\"USERS\"(\"ID\")& %\ntALTER TABLE \"PUBLIC\"\
+    .\"USERS\" ADD CONSTRAINT \"PUBLIC\".\"CONSTRAINT_4\" PRIMARY KEY(\"ID\") INDEX\
+    \ \"PUBLIC\".\"PRIMARY_KEY_4\"' !\n]CREATE UNIQUE INDEX \"PUBLIC\".\"CONSTRAINT_INDEX_4\"\
+    \ ON \"PUBLIC\".\"USERS\"(\"USERNAME\" NULLS FIRST)( %\n{ALTER TABLE \"PUBLIC\"\
+    .\"USERS\" ADD CONSTRAINT \"PUBLIC\".\"CONSTRAINT_4D\" UNIQUE(\"USERNAME\") INDEX\
+    \ \"PUBLIC\".\"CONSTRAINT_INDEX_4\"\0\0\x01�\x05x\x01\v\x05\0\x01\x02\x03\x04\x05\
+    \0!KlorenzoKlorenzo\n<$2a$10$uHkLNrvPL6JJaaFyuH01SulBUHpiqScJC4r.ROAipa.E9VzTN1c0.MROLE_USER\"\
+    KlorenzoLlorenzo2\n<$2a$10$trv3O8FIhH9u0ZncylEjOOp83NvSqsBQzY3GcIBTDkfETzuybGDsSMROLE_USER#KlorenzoMlorenzo23\n\
+    <$2a$10$KDayoWNt8wrqX13KQQ/wU.OBeXo.Drf5mETAcz/o6SSpkEdE5SOvCMROLE_USER$KlorenzoMlorenzo25\n\
+    <$2a$10$QcqU5kgmpiSbYKhWhJ6wuuFkS9v4CQb/Z1XdoO2yGKCoXFACCsMfaMROLE_USER%KlorenzoLlorenzo5\n\
+    <$2a$10$ELZ/aMxuG35yGgshQgFDYuYj2AUu6rOJCMCyOYJjqCb1hBGBm0.ZKMROLE_USER\0\0\0\
+    >\x06�\x02\f\x05\0\x01Klorenzo\x02Llorenzo2\x03Mlorenzo23\x04Mlorenzo25\x05Llorenzo5\0\
+    \0\0\x02�\x04V\x03\x01\x16\0\x06map.19\x06map.1a\x05map.2\x05map.3\x05map.5\x05\
+    map.6\x05map.7\x05map.8\x05map.9\x05map.b\x05map.c\x06name._\fname.index.7\fname.lobData\v\
+    name.lobMap\vname.lobRef\x15name.openTransactions\fname.table.0\fname.table.3\x0f\
+    name.tempLobMap\x0ename.undoLog.1\x0ename.undoLog.2\x1fname:undoLog.1,createVersion:18\x1f\
+    name:undoLog.2,createVersion:18\x06name:_\x15name:openTransactions&name:table.0,key:8fa25204,val:5803b3f1%name:lobMap,key:8fa25204,val:f4470498)name:tempLobMap,key:8fa25204,val:59a6a071%name:lobRef,key:eabe0274,val:3a0aaaf0&name:lobData,key:8fa25204,val:59a6a0716name:table.3,createVersion:1,key:8fa25204,val:6ad869dc6name:index.7,createVersion:1,key:8b8a71c0,val:ef31279e\x01\
+    2\x01c\x019\x016\x018\x013\x015\x01b\x017\x0219\x021a\0\0\x02{\v-\x04\0\t\0\b\
+    chunk.16\bchunk.17\bchunk.18\ameta.id\x06root.1\x06root.2\x06root.5\x06root.b\x06\
+    root.c�\x01chunk:16,block:4,len:1,liveMax:0,livePages:0,map:16,max:a00,next:5,pages:2,root:58000012c54,time:8c71a,unused:9737b,unusedAtVersion:18,version:16,toc:7c0,occupancy:03�\
+    \x01chunk:17,block:6,len:1,liveMax:0,livePages:0,map:16,max:cc0,next:7,pages:5,root:5c0000213d4,time:8c727,unused:9737b,unusedAtVersion:18,version:17,toc:b74,occupancy:1f�\
+    \x01chunk:18,block:7,len:1,liveMax:400,livePages:1,map:18,max:b00,next:8,pages:3,root:6000001ca94,time:8fc78,unusedAtVersion:18,version:18,toc:af5,occupancy:06\x01\
+    1\v6400001b0d2\v60000002bd4\v64000002bd6\v64000012c90\v6400001a144\0\0\x01@\0\0\
+    +�\0\0\x02�\0\x01,�\0\0\x03\0\0\x01�D\0\0\0@\0\x01��\0\0\0\0\0\x02S�\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0chunk:19,block:2,version:19,fletcher:985393ab                \
+    \                                                                  \nchunk:1a,block:3,len:1,map:1a,max:a00,next:5,pages:2,root:68000012c54,time:afb13,version:1a,toc:7d2\
+    \                                                                           \n\
+    \0\0\x04\x02\x04�\0\x05\b\0\x01\x02\x03\x04\x05\x06\a\b\0! &XSET CREATE_BUILD\
+    \ 214\" \"\n2CREATE USER IF NOT EXISTS \"\" SALT '' HASH '' ADMIN#  \n�\x02CREATE\
+    \ CACHED TABLE \"PUBLIC\".\"USERS\"(\n    \"ID\" INTEGER GENERATED BY DEFAULT\
+    \ AS IDENTITY SEQUENCE \"PUBLIC\".\"SYSTEM_SEQUENCE_E2E24BE9_6A93_4880_A00A_2DB54F7E28C1\"\
+    \ NOT NULL,\n    \"NAME\" CHARACTER VARYING(255) NOT NULL,\n    \"USERNAME\" CHARACTER\
+    \ VARYING(255) NOT NULL,\n    \"PASSWORD\" CHARACTER VARYING(255) NOT NULL,\n\
+    \    \"AUTHORITY\" CHARACTER VARYING(255) NOT NULL\n)$ #\n�\x01CREATE SEQUENCE\
+    \ \"PUBLIC\".\"SYSTEM_SEQUENCE_E2E24BE9_6A93_4880_A00A_2DB54F7E28C1\" AS INTEGER\
+    \ START WITH 1 RESTART WITH 6 BELONGS_TO_TABLE% !\nECREATE PRIMARY KEY \"PUBLIC\"\
+    .\"PRIMARY_KEY_4\" ON \"PUBLIC\".\"USERS\"(\"ID\")& %\ntALTER TABLE \"PUBLIC\"\
+    .\"USERS\" ADD CONSTRAINT \"PUBLIC\".\"CONSTRAINT_4\" PRIMARY KEY(\"ID\") INDEX\
+    \ \"PUBLIC\".\"PRIMARY_KEY_4\"' !\n]CREATE UNIQUE INDEX \"PUBLIC\".\"CONSTRAINT_INDEX_4\"\
+    \ ON \"PUBLIC\".\"USERS\"(\"USERNAME\" NULLS FIRST)( %\n{ALTER TABLE \"PUBLIC\"\
+    .\"USERS\" ADD CONSTRAINT \"PUBLIC\".\"CONSTRAINT_4D\" UNIQUE(\"USERNAME\") INDEX\
+    \ \"PUBLIC\".\"CONSTRAINT_INDEX_4\"\0\0\x03!\a�\x01\0\n\0\bchunk.16\bchunk.17\b\
+    chunk.18\bchunk.19\ameta.id\x06root.1\x06root.2\x06root.5\x06root.b\x06root.c�\
+    \x01chunk:16,block:4,len:1,liveMax:0,livePages:0,map:16,max:a00,next:5,pages:2,root:58000012c54,time:8c71a,unused:9737b,unusedAtVersion:18,version:16,toc:7c0,occupancy:03�\
+    \x01chunk:17,block:6,len:1,liveMax:0,livePages:0,map:16,max:cc0,next:7,pages:5,root:5c0000213d4,time:8c727,unused:9737b,unusedAtVersion:18,version:17,toc:b74,occupancy:1f�\
+    \x01chunk:18,block:7,len:1,liveMax:400,livePages:1,map:18,max:b00,next:8,pages:3,root:6000001ca94,time:8fc78,unusedAtVersion:18,version:18,toc:af5,occupancy:06�\
+    \x01chunk:19,block:2,len:1,liveMax:540,livePages:3,map:1a,max:e40,next:3,pages:5,root:640000253d2,time:9737b,unusedAtVersion:19,version:19,toc:bca,occupancy:11\x01\
+    1\v6400001b0d2\v60000002bd4\v68000002bd6\v64000012c90\v6400001a144\0\0\x01@\0\0\
+    +�\0\0\0\0\0\x01,Tion:18\x06name:_\x15name:openTransactions&name:table.0,key:8fa25204,val:5803b3f1%name:lobMap,key:8fa25204,val:f4470498)name:tempLobMap,key:8fa25204,val:59a6a071%name:lobRef,key:eabe0274,val:3a0aaaf0&name:lobData,key:8fa25204,val:59a6a0716name:table.3,createVersion:1,key:8fa25204,val:6ad869dc6name:index.7,createVersion:1,key:8b8a71c0,val:ef31279e\x01\
+    2\x01c\x019\x016\x018\x013\x015\x01b\x017\x0219\x021a\0\0\x02{\v-\x04\0\t\0\b\
+    chunk.16\bchunk.17\bchunk.18\ameta.id\x06root.1\x06root.2\x06root.5\x06root.b\x06\
+    root.c�\x01chunk:16,block:4,len:1,liveMax:0,livePages:0,map:16,max:a00,next:5,pages:2,root:58000012c54,time:8c71a,unused:9737b,unusedAtVersion:18,version:16,toc:7c0,occupancy:03�\
+    \x01chunk:17,block:6,len:1,liveMax:0,livePages:0,map:16,max:cc0,next:7,pages:5,root:5c0000213d4,time:8c727,unused:9737b,unusedAtVersion:18,version:17,toc:b74,occupancy:1f�\
+    \x01chunk:18,block:7,len:1,liveMax:400,livePages:1,map:18,max:b00,next:8,pages:3,root:6000001ca94,time:8fc78,unusedAtVersion:18,version:18,toc:af5,occupancy:06\x01\
+    1\v6400001b0d2\v60000002bd4\v64000002bd6\v64000012c90\v6400001a144\0\0\x01@\0\0\
+    +�\0\0\x02�\0\x01,�\0\0\x03\0\0\x01�D\0\0\0@\0\x01��\0\0\0\0\0\x02S�\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0chunk:1a,block:3,version:1a,fletcher:c212bbd4                \
+    \                                                                  \nchunk:18,block:4,len:1,map:18,max:b00,pages:3,root:6000001ca94,time:8fc78,version:18,toc:af5\
+    \                                                                            \
+    \      \n\0\0\x03�\x03X\0\x02\x0f\0\b3a0aaaf0\b43a4a9e5\b5803b3f1\b59a6a071\b\
+    691541bc\b6ad869dc\a784d9bc\b8b8a71c0\b8fa25204\b969f248b\bbc2eccd2\bd2bf54d2\b\
+    eabe0274\bef31279e\bf4470498#org.h2.mvstore.db.NullValueDataType#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory%org.h2.mvstore.db.RowDataType$Factory\x04\
+    \x05\0\0\0\0\0\0%org.h2.mvstore.type.ByteArrayDataType#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory%org.h2.mvstore.db.RowDataType$Factory\x05\
+    \x06\0\0\0\0\0\0\0#org.h2.mvstore.db.NullValueDataType%org.h2.mvstore.db.RowDataType$Factory\x05\
+    \x02\x02\x02\x02\x01 org.h2.mvstore.type.LongDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType2org.h2.mvstore.db.LobStorageMap$BlobReference$Type,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType-org.h2.mvstore.db.LobStorageMap$BlobMeta$Type\0\
+    \0\x02�\x06\n\x01\x01\x16\0\x06map.17\x06map.18\x05map.2\x05map.3\x05map.5\x05\
+    map.6\x05map.7\x05map.8\x05map.9\x05map.b\x05map.c\x06name._\fname.index.7\fname.lobData\v\
+    name.lobMap\vname.lobRef\x15name.openTransactions\fname.table.0\fname.table.3\x0f\
+    name.tempLobMap\x0ename.undoLog.1\x0ename.undoLog.2\x1fname:undoLog.1,createVersion:17\x1f\
+    name:undoLog.2,createVersion:17\x06name:_\x15name:openTransactions&name:table.0,key:8fa25204,val:5803b3f1%name:lobMap,key:8fa25204,val:f4470498)name:tempLobMap,key:8fa25204,val:59a6a071%name:lobRef,key:eabe0274,val:3a0aaaf0&name:lobData,key:8fa25204,val:59a6a0716name:table.3,createVersion:1,key:8fa25204,val:6ad869dc6name:index.7,createVersion:1,key:8b8a71c0,val:ef31279e\x01\
+    2\x01c\x019\x016\x018\x013\x015\x01b\x017\x0217\x0218\0\0\x03�\x04�\x02\0\v\0\b\
+    chunk.11\bchunk.14\bchunk.15\bchunk.16\bchunk.17\ameta.id\x06root.1\x06root.2\x06\
+    root.5\x06root.b\x06root.c�\x01chunk:11,block:3,len:1,liveMax:0,livePages:0,map:14,max:a00,next:4,pages:3,root:4400001a8d2,time:7ec93,unused:8c727,unusedAtVersion:16,version:11,toc:911,occupancy:07�\
+    \x01chunk:14,block:5,len:1,liveMax:0,livePages:0,map:16,max:900,pages:2,root:5000000ced6,time:7f57e,unused:8c727,unusedAtVersion:16,version:14,toc:7a3,occupancy:03�\
+    \x01chunk:15,block:2,len:1,liveMax:0,livePages:0,map:16,max:bc0,next:4,pages:4,root:54000019794,time:86f17,unused:8c727,unusedAtVersion:16,version:15,toc:978,occupancy:0f�\
+    \x01chunk:16,block:4,len:1,liveMax:600,livePages:1,map:16,max:a00,next:5,pages:2,root:58000012c54,time:8c71a,unusedAtVersion:16,version:16,toc:7c0,occupancy:02�\
+    \x01chunk:17,block:6,len:1,liveMax:1c0,livePages:2,map:16,max:cc0,next:7,pages:5,root:5c0000213d4,time:8c727,unusedAtVersion:17,version:17,toc:b74,occupancy:19\x01\
+    1\v60000012792\v60000002bd4\v58000002bd6\v5c0000105ce\v5c0000163c4\0\0\0�\0\0\
+    +�\0\0\0@\0\x01'�\0\0\0\0\0\x01ʔ\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0chunk:18,block:4,version:18,fletcher:975692ac\
+    \                                                                            \
+    \      \nchunk:1b,block:5,len:1,map:1a,max:c40,next:6,pages:5,root:6c000024ed2,time:afb20,version:1b,toc:baf\
+    \                                                                           \n\
+    \0\0\x03�\x03[\0\x02\x0f\0\b3a0aaaf0\b43a4a9e5\b5803b3f1\b59a6a071\b691541bc\b\
+    6ad869dc\a784d9bc\b8b8a71c0\b8fa25204\b969f248b\bbc2eccd2\bd2bf54d2\beabe0274\b\
+    ef31279e\bf4470498#org.h2.mvstore.db.NullValueDataType#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory%org.h2.mvstore.db.RowDataType$Factory\x04\
+    \x05\0\0\0\0\0\0%org.h2.mvstore.type.ByteArrayDataType#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory%org.h2.mvstore.db.RowDataType$Factory\x05\
+    \x06\0\0\0\0\0\0\0#org.h2.mvstore.db.NullValueDataType%org.h2.mvstore.db.RowDataType$Factory\x05\
+    \x02\x02\x02\x02\x01 org.h2.mvstore.type.LongDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType2org.h2.mvstore.db.LobStorageMap$BlobReference$Type,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType-org.h2.mvstore.db.LobStorageMap$BlobMeta$Type\0\
+    \0\x01�\x05V\x01\v\x05\0\x01\x02\x03\x04\x05\0!KlorenzoKlorenzo\n<$2a$10$uHkLNrvPL6JJaaFyuH01SulBUHpiqScJC4r.ROAipa.E9VzTN1c0.MROLE_USER\"\
+    KlorenzoLlorenzo2\n<$2a$10$trv3O8FIhH9u0ZncylEjOOp83NvSqsBQzY3GcIBTDkfETzuybGDsSMROLE_USER#KlorenzoMlorenzo23\n\
+    <$2a$10$KDayoWNt8wrqX13KQQ/wU.OBeXo.Drf5mETAcz/o6SSpkEdE5SOvCMROLE_USER$KlorenzoMlorenzo25\n\
+    <$2a$10$QcqU5kgmpiSbYKhWhJ6wuuFkS9v4CQb/Z1XdoO2yGKCoXFACCsMfaMROLE_USER%KlorenzoLlorenzo5\n\
+    <$2a$10$ELZ/aMxuG35yGgshQgFDYuYj2AUu6rOJCMCyOYJjqCb1hBGBm0.ZKMROLE_USER\0\0\0\
+    >\x06T\x02\f\x05\0\x01Klorenzo\x02Llorenzo2\x03Mlorenzo23\x04Mlorenzo25\x05Llorenzo5\0\
+    \0\0\x02�\x048\x03\x01\x16\0\x06map.19\x06map.1a\x05map.2\x05map.3\x05map.5\x05\
+    map.6\x05map.7\x05map.8\x05map.9\x05map.b\x05map.c\x06name._\fname.index.7\fname.lobData\v\
+    name.lobMap\vname.lobRef\x15name.openTransactions\fname.table.0\fname.table.3\x0f\
+    name.tempLobMap\x0ename.undoLog.1\x0ename.undoLog.2\x1fname:undoLog.1,createVersion:18\x1f\
+    name:undoLog.2,createVersion:18\x06name:_\x15name:openTransactions&name:table.0,key:8fa25204,val:5803b3f1%name:lobMap,key:8fa25204,val:f4470498)name:tempLobMap,key:8fa25204,val:59a6a071%name:lobRef,key:eabe0274,val:3a0aaaf0&name:lobData,key:8fa25204,val:59a6a0716name:table.3,createVersion:1,key:8fa25204,val:6ad869dc6name:index.7,createVersion:1,key:8b8a71c0,val:ef31279e\x01\
+    2\x01c\x019\x016\x018\x013\x015\x01b\x017\x0219\x021a\0\0\x02t\vT\x04\0\t\0\b\
+    chunk.18\bchunk.19\bchunk.1a\ameta.id\x06root.1\x06root.2\x06root.5\x06root.b\x06\
+    root.c�\x01chunk:18,block:4,len:1,liveMax:0,livePages:0,map:18,max:b00,pages:3,root:6000001ca94,time:8fc78,unused:afb20,unusedAtVersion:1a,version:18,toc:af5,occupancy:07�\
+    \x01chunk:19,block:2,len:1,liveMax:0,livePages:0,map:1a,max:e40,next:3,pages:5,root:640000253d2,time:9737b,unused:afb20,unusedAtVersion:1a,version:19,toc:bca,occupancy:1f�\
+    \x01chunk:1a,block:3,len:1,liveMax:600,livePages:1,map:1a,max:a00,next:5,pages:2,root:68000012c54,time:afb13,unusedAtVersion:1a,version:1a,toc:7d2,occupancy:02\x01\
+    1\v6c00001abd2\v6c000002bd4\v68000002bd6\v6c000012790\v6c000019c44\0\0\0�\0\0\
+    +�\0\0\x02�\0\x01'�\0\0\x03\0\0\x01�D\0\0\0@\0\x01��\0\0\0\0\0\x02N�\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0chunk:1b,block:5,version:1b,fletcher:c32bbcd7\
+    \                                                                            \
+    \      \nchunk:1c,block:6,len:1,map:1c,max:d00,next:7,pages:3,root:7000001ec54,time:c4e09,version:1c,toc:acb\
+    \                                                                           \n\
+    \0\0\x04v\x04�\0\x02\x11\0\b3302035b\b3a0aaaf0\b43a4a9e5\b5803b3f1\b59a6a071\b\
+    691541bc\b6ad869dc\a784d9bc\b8b8a71c0\b8fa25204\b969f248b\bbc2eccd2\bd2bf54d2\b\
+    e6398e35\beabe0274\bef31279e\bf4470498#org.h2.mvstore.db.NullValueDataType#org.h2.mvstore.db.NullValueDataType#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory%org.h2.mvstore.db.RowDataType$Factory\x04\
+    \x05\0\0\0\0\0\0%org.h2.mvstore.type.ByteArrayDataType#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory%org.h2.mvstore.db.RowDataType$Factory\x05\
+    \x06\0\0\0\0\0\0\0#org.h2.mvstore.db.NullValueDataType%org.h2.mvstore.db.RowDataType$Factory\x05\
+    \x02\x02\x02\x02\x01 org.h2.mvstore.type.LongDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType2org.h2.mvstore.db.LobStorageMap$BlobReference$Type,org.h2.mvstore.tx.VersionedValueType$Factory#org.h2.mvstore.db.NullValueDataType-org.h2.mvstore.db.LobStorageMap$BlobMeta$Type\0\
+    \0\x02�\a�\x01\x01\x16\0\x06map.1b\x06map.1c\x05map.2\x05map.3\x05map.5\x05map.6\x05\
+    map.7\x05map.8\x05map.9\x05map.b\x05map.c\x06name._\fname.index.7\fname.lobData\v\
+    name.lobMap\vname.lobRef\x15name.openTransactions\fname.table.0\fname.table.3\x0f\
+    name.tempLobMap\x0ename.undoLog.1\x0ename.undoLog.2\x1fname:undoLog.1,createVersion:1b\x1f\
+    name:undoLog.2,createVersion:1b\x06name:_\x15name:openTransactions&name:table.0,key:8fa25204,val:5803b3f1%name:lobMap,key:8fa25204,val:f4470498)name:tempLobMap,key:8fa25204,val:59a6a071%name:lobRef,key:eabe0274,val:3a0aaaf0&name:lobData,key:8fa25204,val:59a6a0716name:table.3,createVersion:1,key:8fa25204,val:6ad869dc6name:index.7,createVersion:1,key:8b8a71c0,val:ef31279e\x01\
+    2\x01c\x019\x016\x018\x013\x015\x01b\x017\x021b\x021c\0\0\x03\x1a\x04�\x02\0\n\
+    \0\bchunk.18\bchunk.19\bchunk.1a\bchunk.1b\ameta.id\x06root.1\x06root.2\x06root.5\x06\
+    root.b\x06root.c�\x01chunk:18,block:4,len:1,liveMax:0,livePages:0,map:18,max:b00,pages:3,root:6000001ca94,time:8fc78,unused:afb20,unusedAtVersion:1a,version:18,toc:af5,occupancy:07�\
+    \x01chunk:19,block:2,len:1,liveMax:0,livePages:0,map:1a,max:e40,next:3,pages:5,root:640000253d2,time:9737b,unused:afb20,unusedAtVersion:1a,version:19,toc:bca,occupancy:1f�\
+    \x01chunk:1a,block:3,len:1,liveMax:600,livePages:1,map:1a,max:a00,next:5,pages:2,root:68000012c54,time:afb13,unusedAtVersion:1a,version:1a,toc:7d2,occupancy:02�\
+    \x01chunk:1b,block:5,len:1,liveMax:240,livePages:2,map:1a,max:c40,next:6,pages:5,root:6c000024ed2,time:afb20,unusedAtVersion:1b,version:1b,toc:baf,occupancy:19\x01\
+    1\v70000014952\v70000002bd6\v68000002bd6\v6c000012790\v6c000019c44\0\0\0�\0\0\
+    +�\0\0\0@\0\x01IR\0\0\0\0\0\x01�T\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\
+    \0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0chunk:1c,block:6,version:1c,fletcher:c43dbdd9\
+    \                                                                            \
+    \      \n"
+    learner_created: false
+  - name: src/antifraud/DB.trace.db
+    visible: true
+    text: "2023-09-15 09:31:24 jdbc[3]: null\norg.h2.message.DbException: The connection\
+    \ was not closed by the application and is garbage collected [90018-214]\n\tat\
+    \ org.h2.message.DbException.get(DbException.java:223)\n\tat org.h2.message.DbException.get(DbException.java:199)\n\
+    \tat org.h2.message.DbException.get(DbException.java:188)\n\tat org.h2.jdbc.JdbcConnection.closeOld(JdbcConnection.java:190)\n\
+    \tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:132)\n\tat org.h2.Driver.connect(Driver.java:59)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\t\
+    at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\tat\
+    \ antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.User.Dao.DbUserDao.findAll(DbUserDao.java:52)\n\
+    \tat antifraud.Rest.UserController.list(UserController.java:92)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native\
+    \ Method)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:655)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\nCaused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.getJdbcSQLException(DbException.java:678)\n\t\
+    at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)\n\t...\
+    \ 106 more\n2023-09-15 09:31:28 jdbc[4]: java.lang.Exception: Open Stack Trace\n\
+    \tat org.h2.util.CloseWatcher.register(CloseWatcher.java:85)\n\tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:133)\n\
+    \tat org.h2.Driver.connect(Driver.java:59)\n\tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\t\
+    at antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.User.Dao.DbUserDao.findAll(DbUserDao.java:52)\n\
+    \tat antifraud.Rest.UserController.list(UserController.java:92)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native\
+    \ Method)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:655)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\n\norg.h2.message.DbException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.get(DbException.java:223)\n\tat org.h2.message.DbException.get(DbException.java:199)\n\
+    \tat org.h2.message.DbException.get(DbException.java:188)\n\tat org.h2.jdbc.JdbcConnection.closeOld(JdbcConnection.java:190)\n\
+    \tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:132)\n\tat org.h2.Driver.connect(Driver.java:59)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\t\
+    at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\tat\
+    \ antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.DB.DbClient.select(DbClient.java:48)\n\
+    \tat antifraud.User.Dao.DbUserDao.findByUsername(DbUserDao.java:69)\n\tat antifraud.Rest.UserController.register(UserController.java:43)\n\
+    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\
+    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:681)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\nCaused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.getJdbcSQLException(DbException.java:678)\n\t\
+    at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)\n\t...\
+    \ 107 more\n2023-09-15 09:33:03 jdbc[3]: null\norg.h2.message.DbException: The\
+    \ connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.get(DbException.java:223)\n\tat org.h2.message.DbException.get(DbException.java:199)\n\
+    \tat org.h2.message.DbException.get(DbException.java:188)\n\tat org.h2.jdbc.JdbcConnection.closeOld(JdbcConnection.java:190)\n\
+    \tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:132)\n\tat org.h2.Driver.connect(Driver.java:59)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\t\
+    at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\tat\
+    \ antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.User.Dao.DbUserDao.findAll(DbUserDao.java:52)\n\
+    \tat antifraud.Rest.UserController.list(UserController.java:92)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native\
+    \ Method)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:655)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\nCaused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.getJdbcSQLException(DbException.java:678)\n\t\
+    at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)\n\t...\
+    \ 106 more\n2023-09-15 09:39:53 jdbc[3]: null\norg.h2.message.DbException: The\
+    \ connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.get(DbException.java:223)\n\tat org.h2.message.DbException.get(DbException.java:199)\n\
+    \tat org.h2.message.DbException.get(DbException.java:188)\n\tat org.h2.jdbc.JdbcConnection.closeOld(JdbcConnection.java:190)\n\
+    \tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:132)\n\tat org.h2.Driver.connect(Driver.java:59)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\t\
+    at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\tat\
+    \ antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.User.Dao.DbUserDao.findAll(DbUserDao.java:52)\n\
+    \tat antifraud.Rest.UserController.list(UserController.java:92)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native\
+    \ Method)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:655)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\nCaused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.getJdbcSQLException(DbException.java:678)\n\t\
+    at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)\n\t...\
+    \ 106 more\n2023-09-15 09:40:24 jdbc[4]: java.lang.Exception: Open Stack Trace\n\
+    \tat org.h2.util.CloseWatcher.register(CloseWatcher.java:85)\n\tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:133)\n\
+    \tat org.h2.Driver.connect(Driver.java:59)\n\tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\t\
+    at antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.User.Dao.DbUserDao.findAll(DbUserDao.java:52)\n\
+    \tat antifraud.Rest.UserController.list(UserController.java:92)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native\
+    \ Method)\n\tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:898)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:655)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\n\norg.h2.message.DbException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.get(DbException.java:223)\n\tat org.h2.message.DbException.get(DbException.java:199)\n\
+    \tat org.h2.message.DbException.get(DbException.java:188)\n\tat org.h2.jdbc.JdbcConnection.closeOld(JdbcConnection.java:190)\n\
+    \tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:132)\n\tat org.h2.Driver.connect(Driver.java:59)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\t\
+    at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\tat\
+    \ antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.DB.DbClient.select(DbClient.java:48)\n\
+    \tat antifraud.User.Dao.DbUserDao.findByUsername(DbUserDao.java:69)\n\tat antifraud.Rest.UserController.register(UserController.java:43)\n\
+    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\
+    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:681)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\nCaused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.getJdbcSQLException(DbException.java:678)\n\t\
+    at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)\n\t...\
+    \ 107 more\n2023-09-15 09:41:30 jdbc[3]: null\norg.h2.message.DbException: The\
+    \ connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.get(DbException.java:223)\n\tat org.h2.message.DbException.get(DbException.java:199)\n\
+    \tat org.h2.message.DbException.get(DbException.java:188)\n\tat org.h2.jdbc.JdbcConnection.closeOld(JdbcConnection.java:190)\n\
+    \tat org.h2.jdbc.JdbcConnection.<init>(JdbcConnection.java:132)\n\tat org.h2.Driver.connect(Driver.java:59)\n\
+    \tat java.sql/java.sql.DriverManager.getConnection(DriverManager.java:681)\n\t\
+    at java.sql/java.sql.DriverManager.getConnection(DriverManager.java:252)\n\tat\
+    \ antifraud.DB.DbClient.selectForList(DbClient.java:65)\n\tat antifraud.DB.DbClient.select(DbClient.java:48)\n\
+    \tat antifraud.User.Dao.DbUserDao.findByUsername(DbUserDao.java:69)\n\tat antifraud.Rest.UserController.register(UserController.java:43)\n\
+    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n\
+    \tat java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)\n\
+    \tat java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\
+    \tat java.base/java.lang.reflect.Method.invoke(Method.java:568)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)\n\
+    \tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)\n\
+    \tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:808)\n\
+    \tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1071)\n\
+    \tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)\n\
+    \tat org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:681)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)\n\
+    \tat javax.servlet.http.HttpServlet.service(HttpServlet.java:764)\n\tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:227)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)\n\t\
+    at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)\n\
+    \tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilterInternal(AuthorizationFilter.java:73)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)\n\
+    \tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)\n\
+    \tat org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.www.BasicAuthenticationFilter.doFilterInternal(BasicAuthenticationFilter.java:166)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)\n\
+    \tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\
+    \tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)\n\
+    \tat org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)\n\
+    \tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)\n\
+    \tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)\n\
+    \tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:189)\n\
+    \tat org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:162)\n\
+    \tat org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:197)\n\
+    \tat org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:97)\n\
+    \tat org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:541)\n\
+    \tat org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:135)\n\
+    \tat org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)\n\
+    \tat org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:78)\n\
+    \tat org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:360)\n\
+    \tat org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)\n\
+    \tat org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:65)\n\
+    \tat org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:890)\n\
+    \tat org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1789)\n\
+    \tat org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)\n\
+    \tat org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)\n\
+    \tat org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)\n\
+    \tat java.base/java.lang.Thread.run(Thread.java:833)\nCaused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException:\
+    \ The connection was not closed by the application and is garbage collected [90018-214]\n\
+    \tat org.h2.message.DbException.getJdbcSQLException(DbException.java:678)\n\t\
+    at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)\n\t...\
+    \ 107 more\n"
+    learner_created: false
+  - name: src/antifraud/User/DB/MyUserAdapter.java
+    visible: true
+    text: |-
+      package antifraud.User.DB;
+      
+      import antifraud.User.User;
+      import org.springframework.security.core.GrantedAuthority;
+      import org.springframework.security.core.authority.SimpleGrantedAuthority;
+      import org.springframework.security.core.userdetails.UserDetails;
+      
+      import java.util.Collection;
+      import java.util.List;
+      
+      public class MyUserAdapter implements UserDetails {
+          private User user;
+      
+          public MyUserAdapter(User user) {
+              this.user = user;
+          }
+      
+          @Override
+          public Collection<? extends GrantedAuthority> getAuthorities() {
+              return List.of(new SimpleGrantedAuthority(user.getAuthority()));
+          }
+      
+          @Override
+          public String getPassword() {
+              return user.getPassword();
+          }
+      
+          @Override
+          public String getUsername() {
+              return user.getUsername();
+          }
+      
+          @Override
+          public boolean isAccountNonExpired() {
+              return true;
+          }
+      
+          @Override
+          public boolean isAccountNonLocked() {
+              return true;
+          }
+      
+          @Override
+          public boolean isCredentialsNonExpired() {
+              return true;
+          }
+      
+          @Override
+          public boolean isEnabled() {
+              return true;
+          }
+          //...
+      }
+    learner_created: false
+  - name: test/AntiFraudTest.java
+    visible: false
+    text: |-
+      import antifraud.AntiFraudApplication;
+      import com.google.gson.JsonArray;
+      import com.google.gson.JsonObject;
+      import org.hyperskill.hstest.dynamic.DynamicTest;
+      import org.hyperskill.hstest.dynamic.input.DynamicTesting;
+      import org.hyperskill.hstest.exception.outcomes.UnexpectedError;
+      import org.hyperskill.hstest.exception.outcomes.WrongAnswer;
+      import org.hyperskill.hstest.mocks.web.request.HttpRequest;
+      import org.hyperskill.hstest.mocks.web.response.HttpResponse;
+      import org.hyperskill.hstest.stage.SpringTest;
+      import org.hyperskill.hstest.testcase.CheckResult;
+      
+      import java.util.ArrayList;
+      import java.util.List;
+      
+      import static org.hyperskill.hstest.common.JsonUtils.getJson;
+      import static org.hyperskill.hstest.testing.expect.Expectation.expect;
+      import static org.hyperskill.hstest.testing.expect.json.JsonChecker.*;
+      
+      class TestHint {
+          private final String apiPath;
+          private final String requestBody;
+          private final String message;
+      
+          public TestHint(String apiPath, String requestBody, String message) {
+              this.apiPath = apiPath;
+              this.requestBody = requestBody;
+              this.message = message;
+          }
+      
+          @Override
+          public String toString() {
+              return "Test case\n" +
+                      "Testing api: '" + apiPath + '\'' + "\n" +
+                      (requestBody.length() > 0 ? "request: '" + requestBody + '\'' + "\n" : "") +
+                      "Expectations: '" + message + "'" + "\n" +
+                      "-----";
+          }
+      }
+      
+      public class AntiFraudTest extends SpringTest {
+      
+          private final String transactionApi = "/api/antifraud/transaction";
+          private final String userApi = "/api/auth/user";
+          private final String userListApi = "/api/auth/list";
+          List<Integer> userIdList = new ArrayList<>();
+      
+          private final String johndoe1 = "{\n" +
+                  "   \"name\": \"John Doe 1\",\n" +
+                  "   \"username\": \"johndoe1\",\n" +
+                  "   \"password\": \"oMoa3VvqnLxW\"\n" +
+                  "}";
+      
+          private final String johndoe1Upper = "{\n" +
+                  "   \"name\": \"John Doe 1\",\n" +
+                  "   \"username\": \"JohnDoe1\",\n" +
+                  "   \"password\": \"oMoa3VvqnLxW\"\n" +
+                  "}";
+      
+          private final String johndoe2 = "{\n" +
+                  "   \"name\": \"John Doe 2\",\n" +
+                  "   \"username\": \"johndoe2\",\n" +
+                  "   \"password\": \"oMoa3VvqnLxW\"\n" +
+                  "}";
+      
+          private final String johndoe2Upper = "{\n" +
+                  "   \"name\": \"John Doe 2\",\n" +
+                  "   \"username\": \"Johnddoe2\",\n" +
+                  "   \"password\": \"oMoa3VvqnLxW\"\n" +
+                  "}";
+      
+          private final String wronguser1 = "{\n" +
+                  "   \"name\": \"John Doe 1\",\n" +
+                  "   \"password\": \"oa3VvqnLxW\"\n" +
+                  "}";
+      
+          private final String wronguser2 = "{\n" +
+                  "   \"name\": \"John Doe 2\",\n" +
+                  "   \"username\": \"johndoe1\"\n" +
+                  "}";
+      
+          private final String wronguserCred1 = "{\n" +
+                  "   \"name\": \"John Doe 1\",\n" +
+                  "   \"username\": \"johndoe1\",\n" +
+                  "   \"password\": \"oa3VvqnLxW\"\n" +
+                  "}";
+      
+          private final String wronguserCred2 = "{\n" +
+                  "   \"name\": \"John Do\",\n" +
+                  "   \"username\": \"johndo\",\n" +
+                  "   \"password\": \"oMoa3VvqnLxW\"\n" +
+                  "}";
+      
+          private final String listAnswer1 = "[ {\n" +
+                  "  \"id\" : 1,\n" +
+                  "  \"name\" : \"John Doe 1\",\n" +
+                  "  \"username\" : \"johndoe1\"\n" +
+                  "}, {\n" +
+                  "  \"id\" : 3,\n" +
+                  "  \"name\" : \"John Doe 2\",\n" +
+                  "  \"username\" : \"johndoe2\"\n" +
+                  "} ]";
+      
+          private final String listAnswer2 = "[ {\n" +
+                  "  \"id\" : 3,\n" +
+                  "  \"name\" : \"John Doe 2\",\n" +
+                  "  \"username\" : \"johndoe2\"\n" +
+                  "} ]";
+      
+          public AntiFraudTest() {
+              super(AntiFraudApplication.class, "../service_db.mv.db");
+          }
+      
+          /**
+           * Method for restarting application
+           *
+           */
+          private CheckResult restartApplication() {
+              try {
+                  reloadSpring();
+              } catch (Exception ex) {
+                  throw new UnexpectedError(ex.getMessage());
+              }
+              return CheckResult.correct();
+          }
+      
+          private HttpResponse checkResponseStatus(String user, String body,
+                                                   int status, String api, String method) {
+              HttpRequest request = null;
+              switch (method) {
+                  case "GET":
+                      request = get(api);
+                      break;
+                  case "POST":
+                      request = post(api, body);
+                      break;
+                  case "PUT":
+                      request = put(api, body);
+                      break;
+                  case "DELETE":
+                      request = delete(api);
+                      break;
+              }
+      
+              if (user != null) {
+                  JsonObject userJson = getJson(user).getAsJsonObject();
+                  String password = userJson.get("password").getAsString();
+                  String login = userJson.get("username").getAsString().toLowerCase();
+                  request = request.basicAuth(login, password);
+              }
+              HttpResponse response = request.send();
+      
+              if (response.getStatusCode() != status) {
+                  throw new WrongAnswer(method + " " + api  + " should respond with "
+                          + "status code " + status + ", responded: " + response.getStatusCode() + "\n"
+                          + "Response body:\n" + response.getContent() + "\n");
+              }
+              return response;
+          }
+      
+          public boolean isNumeric(String strNum) {
+              if (strNum == null) {
+                  return false;
+              }
+              try {
+                  long l = Long.parseLong(strNum);
+              } catch (NumberFormatException nfe) {
+                  return false;
+              }
+              return true;
+          }
+      
+          CheckResult testAddUser(String body, int status, TestHint hint) {
+      
+              System.out.println(hint.toString());
+      
+              HttpResponse response = checkResponseStatus(null, body, status, userApi, "POST");
+      
+              if (response.getStatusCode() == 201) {
+      
+                  JsonObject rightResponse = getJson(body).getAsJsonObject();
+                  rightResponse.remove("password");
+      
+                  // Check is it JSON in response or something else
+                  if (!response.getJson().isJsonObject()) {
+                      return CheckResult.wrong("Wrong object in response, expected JSON but was \n" +
+                              response.getContent().getClass());
+      
+                  }
+      
+                  JsonObject jsonResponse = response.getJson().getAsJsonObject();
+      
+                  // Check if password is presence in response
+                  if (jsonResponse.get("password") != null) {
+                      return CheckResult.wrong("You must remove password from response\n" +
+                              jsonResponse);
+                  }
+      
+                  if (jsonResponse.get("id") == null) {
+                      return CheckResult.wrong("Response must contain user ID\n" +
+                              "Received response:\n" +
+                              jsonResponse);
+                  }
+      
+                  if (jsonResponse.get("id").isJsonNull()) {
+                      return CheckResult.wrong("Response must contain user ID\n" +
+                              "Received response:\n" +
+                              jsonResponse);
+                  }
+      
+                  if (userIdList.contains(jsonResponse.get("id").getAsInt())) {
+                      return CheckResult.wrong("User ID must be unique!\n" +
+                              "Received response:\n" +
+                              jsonResponse);
+                  }
+      
+                  rightResponse.addProperty("id", jsonResponse.get("id").toString());
+                  // Check JSON in response
+                  expect(response.getContent()).asJson().check(
+                          isObject()
+                                  .value("id", isInteger())
+                                  .value("name", rightResponse.get("name").getAsString())
+                                  .value("username", isString(s -> s.equalsIgnoreCase(rightResponse.get("username").getAsString())))
+                  );
+                  userIdList.add(jsonResponse.get("id").getAsInt());
+              }
+              return CheckResult.correct();
+          }
+      
+          CheckResult testDeleteUser(String body, int status, String user, TestHint hint) {
+      
+              System.out.println(hint.toString());
+      
+              HttpResponse response = checkResponseStatus(body, "", status, userApi + "/" + user, "DELETE");
+      
+              if (response.getStatusCode() == 200) {
+      
+                  // Check is it JSON in response or something else
+                  if (!response.getJson().isJsonObject()) {
+                      return CheckResult.wrong("Wrong object in response, expected JSON but was \n" +
+                              response.getContent().getClass());
+      
+                  }
+      
+                  JsonObject jsonResponse = response.getJson().getAsJsonObject();
+      
+                  // Check JSON in response
+                  expect(response.getContent()).asJson().check(
+                          isObject()
+                                  .value("status", "Deleted successfully!")
+                                  .value("username", isString(s -> s.equalsIgnoreCase(user)))
+                  );
+              }
+              return CheckResult.correct();
+          }
+      
+          private CheckResult testListUser(String user, int status, String answer,
+                                           int position, TestHint hint) {
+      
+              System.out.println(hint.toString());
+      
+              HttpResponse response = checkResponseStatus(user, "", status, userListApi, "GET");
+      
+              if (response.getStatusCode() == 200) {
+                  // Check is it array of JSON in response or something else
+                  if (!response.getJson().isJsonArray()) {
+                      return CheckResult.wrong("Wrong object in response, expected array of JSON but was \n" +
+                              response.getContent().getClass());
+      
+                  }
+      
+                  JsonArray correctJson = getJson(answer).getAsJsonArray();
+                  JsonArray responseJson = getJson(response.getContent()).getAsJsonArray();
+                  if (responseJson.size() == 0) {
+                      throw new WrongAnswer("Empty array in response!");
+                  }
+      
+                  if (responseJson.size() != position + 1) {
+                      throw new WrongAnswer("Incorrect number - " +  responseJson.size() +
+                              " users in response, must be - " + (position + 1));
+                  }
+      
+                  // Check JSON in response
+                  expect(responseJson.get(position).toString()).asJson().check(
+                          isObject()
+                                  .value("id", isInteger())
+                                  .value("name", correctJson.get(position).getAsJsonObject().get("name").getAsString())
+                                  .value("username",
+                                          isString(s -> s.equalsIgnoreCase(correctJson.get(position).getAsJsonObject()
+                                                  .get("username").getAsString()))
+                                  ));
+      
+              }
+              return CheckResult.correct();
+          }
+      
+          private CheckResult testTransaction(String user, String api, String method,
+                                              int status, String amount, String answer, TestHint hint) {
+      
+              System.out.println(hint.toString());
+      
+              JsonObject jsonBody = new JsonObject();
+              if (isNumeric(amount)) {
+                  jsonBody.addProperty("amount", Long.parseLong(amount));
+              } else if (amount == null) {
+                  jsonBody.addProperty("amount", (Boolean) null);
+              } else if (!amount.equals("empty")) {
+                  jsonBody.addProperty("amount", amount);
+              }
+      
+              HttpResponse response = checkResponseStatus(user, jsonBody.toString(), status, api, method);
+      
+              // Check JSON in response
+              if (response.getStatusCode() == 200) {
+                  expect(response.getContent()).asJson().check(
+                          isObject()
+                                  .value("result", answer));
+              }
+              return CheckResult.correct();
+          }
+      
+          @DynamicTest
+          DynamicTesting[] dt = new DynamicTesting[]{
+                  // Test POST request for signup api
+                  () -> testAddUser(wronguser1, 400,
+                          new TestHint(userApi, wronguser1, "In case of wrong data in request, endpoint" +
+                                  " must respond with BAD REQUEST  status (400).")), // 1
+      
+                  () -> testAddUser(wronguser2, 400,
+                          new TestHint(userApi, wronguser2, "In case of wrong data in request, endpoint" +
+                                  " must respond with BAD REQUEST  status (400).")), // 2
+      
+                  () -> testAddUser(johndoe1, 201,
+                          new TestHint(userApi, johndoe1, "If user successfully added, endpoint" +
+                                  " must respond with HTTP CREATED status (201) ")), // 3
+      
+                  () -> testListUser(johndoe1, 200,  listAnswer1, 0,
+                          new TestHint(userListApi, "", "Endpoint must respond with HTTP OK status (200)" +
+                                  " and body with array of objects representing the users sorted by ID in ascending order.")), // 4
+      
+                  () -> testListUser(wronguserCred1, 401,  listAnswer1, 0,
+                          new TestHint(userListApi, "", "A user with incorrect credentials is not allowed")), // 5
+      
+                  () -> testListUser(wronguserCred2, 401,  listAnswer1, 0,
+                          new TestHint(userListApi, "", "A user with incorrect credentials is not allowed")), // 6
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"1", "ALLOWED",
+                          new TestHint(transactionApi, "amount = 1", "Result validating of Transaction" +
+                                  " must be 'ALLOWED'")), // 7
+      
+                  // Testing persistence
+                  () -> restartApplication(), // 8
+      
+                  () -> testListUser(johndoe1, 200,  listAnswer1, 0,
+                          new TestHint(userListApi, "", "After restart user must exist")), // 9
+      
+                  () -> testAddUser(johndoe1, 409,
+                          new TestHint(userApi, johndoe1, "In case of an attempt to register an existing user," +
+                                  " endpoint must respond with HTTP CONFLICT status (409).")), // 10
+      
+                  () -> testAddUser(johndoe2, 201,
+                          new TestHint(userApi, johndoe2, "If user successfully added, endpoint" +
+                                  " must respond with HTTP CREATED status (201) ")), // 11
+      
+                  () -> testListUser(johndoe1, 200,  listAnswer1, 1,
+                          new TestHint(userListApi, "", "Endpoint must respond with HTTP OK status (200)" +
+                                  " and body with array of objects representing the users sorted by ID in ascending order.")), // 12
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"199", "ALLOWED",
+                          new TestHint(transactionApi, "amount = 199", "Result validating of Transaction" +
+                                  " must be 'ALLOWED'")), // 13
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"200", "ALLOWED",
+                          new TestHint(transactionApi, "amount = 200", "Result validating of Transaction" +
+                                  " must be 'ALLOWED'")), // 14
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"201", "MANUAL_PROCESSING",
+                          new TestHint(transactionApi, "amount = 201", "Result validating of Transaction" +
+                                  " must be 'MANUAL_PROCESSING'")), // 15
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"1499", "MANUAL_PROCESSING",
+                          new TestHint(transactionApi, "amount = 1499", "Result validating of Transaction" +
+                                  " must be 'MANUAL_PROCESSING'")), // 16
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"1500", "MANUAL_PROCESSING",
+                          new TestHint(transactionApi, "amount = 1500", "Result validating of Transaction" +
+                                  " must be 'MANUAL_PROCESSING'")), // 17
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"1501", "PROHIBITED",
+                          new TestHint(transactionApi, "amount = 1501", "Result validating of Transaction" +
+                                  " must be 'PROHIBITED'")), // 18
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 200,"2000", "PROHIBITED",
+                          new TestHint(transactionApi, "amount = 2000", "Result validating of Transaction" +
+                                  " must be 'PROHIBITED'")), // 19
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 400,"-1", "Wrong request!",
+                          new TestHint(transactionApi, "amount = -1", "Response status" +
+                                  " must be 'Bad request'")), // 20
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 400,"0", "Wrong request!",
+                          new TestHint(transactionApi, "amount = 0", "Response status" +
+                                  " must be 'Bad request'")), // 21
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 400,null, "Wrong request!",
+                          new TestHint(transactionApi, "amount = null", "Response status" +
+                                  " must be 'Bad request'")), // 22
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 400,"", "Wrong request!",
+                          new TestHint(transactionApi, "amount = \"\"", "Response status" +
+                                  " must be 'Bad request'")), // 23
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 400," ", "Wrong request!",
+                          new TestHint(transactionApi, "amount = \" \"", "Response status" +
+                                  " must be 'Bad request'")), // 24
+      
+                  () -> testTransaction(johndoe1, transactionApi, "POST", 400,"empty", "Wrong request!",
+                          new TestHint(transactionApi, "empty body", "Response status" +
+                                  " must be 'Bad request'")), // 25
+      
+                  () -> testDeleteUser(johndoe1,404,"somebody",
+                          new TestHint(userApi, userApi + "/" + "somebody", "If a user is not found," +
+                                  " respond with HTTP Not Found status (404).")), // 26
+      
+                  () -> testTransaction(johndoe1Upper, transactionApi, "POST", 200,"2000", "PROHIBITED",
+                          new TestHint(transactionApi, "amount = 2000", "Usernames must be case insensitive.")), // 27
+      
+                  () -> testDeleteUser(johndoe2,200,"johndoe1",
+                          new TestHint(userApi, userApi + "/" + "johndoe1", "The endpoint must delete" +
+                                  " the user and respond with HTTP OK status (200)")), // 28
+      
+                  () -> testListUser(johndoe2, 200,  listAnswer2, 0,
+                          new TestHint(userListApi, "", "User 'johndoe1' must be delete")), // 29
+      
+                  () -> testListUser(johndoe2, 200,  listAnswer2, 0,
+                          new TestHint(userListApi, "", "Usernames must be case insensitive.")), // 30
+      
+          };
+      }
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/18068#comment
+status: Failed
+feedback:
+  message: Execution failed
+  time: "Mon, 09 Oct 2023 14:01:13 UTC"
+record: 5

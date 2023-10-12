@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class AntiFraudTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class AntiFraudTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/default-package.html">default-package</a> &gt; AntiFraudTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">27.427s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">start</td>
+<td class="success">27.427s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>?[1;31m
+Start test 1?[0m
+?[0;34m __    __   __          __    __       _______. __
+?[0m?[0;34m|  |  |  | |  |        |  |  |  |     /       ||  |
+?[0m?[0;34m|  |__|  | |  |        |  |__|  |    |   (----`|  |
+?[0m?[0;34m|   __   | |  |        |   __   |     \   \    |  |
+?[0m?[0;34m|  |  |  | |  |  __    |  |  |  | .----)   |   |__|
+?[0m?[0;34m|__|  |__| |__| (_ )   |__|  |__| |_______/    (__)
+?[0m?[0;34mlorenzo
+?[0m?[0;34m2023-10-11 15:59:25.714  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Starting AntiFraudApplication using Java 17.0.6 on Kamizolo with PID 26672 (started by Lorenzo in C:\Users\Lorenzo\Documents\Hyperskill\Anti-Fraud\Anti-Fraud System\task)
+?[0m?[0;34m2023-10-11 15:59:25.721  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : No active profile set, falling back to 1 default profile: &quot;default&quot;
+?[0m?[0;34m2023-10-11 15:59:27.215  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+?[0m?[0;34m2023-10-11 15:59:27.290  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 61 ms. Found 3 JPA repository interfaces.
+?[0m?[0;34m2023-10-11 15:59:28.284  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
+?[0m?[0;34m2023-10-11 15:59:28.302  INFO 26672 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+?[0m?[0;34m2023-10-11 15:59:28.303  INFO 26672 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.65]
+?[0m?[0;34m2023-10-11 15:59:28.437  INFO 26672 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+?[0m?[0;34m2023-10-11 15:59:28.437  INFO 26672 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2645 ms
+?[0m?[0;34m2023-10-11 15:59:28.643  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+?[0m?[0;34m2023-10-11 15:59:28.994  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+?[0m?[0;34m2023-10-11 15:59:29.025  INFO 26672 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2'. Database available at 'jdbc:h2:file:../service_db'
+?[0m?[0;34m2023-10-11 15:59:29.257  INFO 26672 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+?[0m?[0;34m2023-10-11 15:59:29.344  INFO 26672 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.11.Final
+?[0m?[0;34m2023-10-11 15:59:29.632  INFO 26672 --- [    Test worker] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+?[0m?[0;34m2023-10-11 15:59:29.815  INFO 26672 --- [    Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+?[0m?[0;34m2023-10-11 15:59:30.696  INFO 26672 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+?[0m?[0;34m2023-10-11 15:59:30.706  INFO 26672 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+?[0m?[0;34m2023-10-11 15:59:31.463  INFO 26672 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1c7fd2e0, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@41831611, org.springframework.security.web.context.SecurityContextPersistenceFilter@e2696e8, org.springframework.security.web.header.HeaderWriterFilter@232be28d, org.springframework.security.web.authentication.logout.LogoutFilter@567baa55, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@38f569d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@70cdbd18, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@40696fc6, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@31921151, org.springframework.security.web.session.SessionManagementFilter@13552290, org.springframework.security.web.access.ExceptionTranslationFilter@81cd90e, org.springframework.security.web.access.intercept.AuthorizationFilter@7095b688]
+?[0m?[0;34m2023-10-11 15:59:31.515  WARN 26672 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+?[0m?[0;34m2023-10-11 15:59:31.723  INFO 26672 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+?[0m?[0;34m2023-10-11 15:59:32.203  INFO 26672 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
+?[0m?[0;34m2023-10-11 15:59:32.252  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
+?[0m?[0;34m2023-10-11 15:59:32.266  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Started AntiFraudApplication in 7.15 seconds (JVM running for 8.418)
+?[0m?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '{
+?[0m?[0;34m   &quot;name&quot;: &quot;John Doe 1&quot;,
+?[0m?[0;34m   &quot;password&quot;: &quot;oa3VvqnLxW&quot;
+?[0m?[0;34m}'
+?[0m?[0;34mExpectations: 'In case of wrong data in request, endpoint must respond with BAD REQUEST  status (400).'
+?[0m?[0;34m-----
+?[0;34m2023-10-11 15:59:32.653  INFO 26672 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+?[0m?[0;34m2023-10-11 15:59:32.654  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+?[0m?[0;34m2023-10-11 15:59:32.655  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+?[0m?[1;31m
+Start test 2?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '{
+?[0m?[0;34m   &quot;name&quot;: &quot;John Doe 2&quot;,
+?[0m?[0;34m   &quot;username&quot;: &quot;johndoe1&quot;
+?[0m?[0;34m}'
+?[0m?[0;34mExpectations: 'In case of wrong data in request, endpoint must respond with BAD REQUEST  status (400).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 3?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '{
+?[0m?[0;34m   &quot;name&quot;: &quot;John Doe 1&quot;,
+?[0m?[0;34m   &quot;username&quot;: &quot;johndoe1&quot;,
+?[0m?[0;34m   &quot;password&quot;: &quot;oMoa3VvqnLxW&quot;
+?[0m?[0;34m}'
+?[0m?[0;34mExpectations: 'If user successfully added, endpoint must respond with HTTP CREATED status (201) '
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 4?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'Endpoint must respond with HTTP OK status (200) and body with array of objects representing the users sorted by ID in ascending order.'
+?[0m?[0;34m-----
+?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;username&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;ADMINISTRATOR&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 5?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '{
+?[0m?[0;34m   &quot;name&quot;: &quot;John Doe 1&quot;,
+?[0m?[0;34m   &quot;username&quot;: &quot;johndoe1&quot;,
+?[0m?[0;34m   &quot;password&quot;: &quot;oMoa3VvqnLxW&quot;
+?[0m?[0;34m}'
+?[0m?[0;34mExpectations: 'If user successfully added, endpoint must respond with HTTP CREATED status (201) '
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 6?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'Endpoint must respond with HTTP OK status (200) and body with array of objects representing the users sorted by ID in ascending order.'
+?[0m?[0;34m-----
+?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;username&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;ADMINISTRATOR&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 2,
+?[0m?[0;34m  &quot;username&quot; : &quot;johndoe1&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;John Doe 1&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;MERCHANT&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 7?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'A user with incorrect credentials is not allowed'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 8?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'A user with incorrect credentials is not allowed'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 9?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'Merchant after registration must be LOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 10?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/access'
+?[0m?[0;34mExpectations: 'A user johndoe1 must be UNLOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 11?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'A user johndoe1 must be UNLOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 12?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 1'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'ALLOWED''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 13?[0m
+?[0;34m2023-10-11 15:59:34.554  INFO 26672 --- [       Thread-5] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+?[0m?[0;34m2023-10-11 15:59:34.556  INFO 26672 --- [       Thread-5] o.a.c.c.C.[Tomcat].[localhost].[/]       : Destroying Spring FrameworkServlet 'dispatcherServlet'
+?[0m?[0;34m2023-10-11 15:59:34.566  INFO 26672 --- [       Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+?[0m?[0;34m2023-10-11 15:59:34.569  INFO 26672 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+?[0m?[0;34m2023-10-11 15:59:34.588  INFO 26672 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+?[0;34m __    __   __          __    __       _______. __
+?[0m?[0;34m|  |  |  | |  |        |  |  |  |     /       ||  |
+?[0m?[0;34m|  |__|  | |  |        |  |__|  |    |   (----`|  |
+?[0m?[0;34m|   __   | |  |        |   __   |     \   \    |  |
+?[0m?[0;34m|  |  |  | |  |  __    |  |  |  | .----)   |   |__|
+?[0m?[0;34m|__|  |__| |__| (_ )   |__|  |__| |_______/    (__)
+?[0m?[0;34mlorenzo
+?[0m?[0;34m2023-10-11 15:59:44.929  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Starting AntiFraudApplication using Java 17.0.6 on Kamizolo with PID 26672 (started by Lorenzo in C:\Users\Lorenzo\Documents\Hyperskill\Anti-Fraud\Anti-Fraud System\task)
+?[0m?[0;34m2023-10-11 15:59:44.930  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : No active profile set, falling back to 1 default profile: &quot;default&quot;
+?[0m?[0;34m2023-10-11 15:59:45.279  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+?[0m?[0;34m2023-10-11 15:59:45.294  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 14 ms. Found 3 JPA repository interfaces.
+?[0m?[0;34m2023-10-11 15:59:45.392  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
+?[0m?[0;34m2023-10-11 15:59:45.393  INFO 26672 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+?[0m?[0;34m2023-10-11 15:59:45.394  INFO 26672 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.65]
+?[0m?[0;34m2023-10-11 15:59:45.428  INFO 26672 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+?[0m?[0;34m2023-10-11 15:59:45.428  INFO 26672 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 495 ms
+?[0m?[0;34m2023-10-11 15:59:45.474  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+?[0m?[0;34m2023-10-11 15:59:45.500  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+?[0m?[0;34m2023-10-11 15:59:45.501  INFO 26672 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2'. Database available at 'jdbc:h2:file:../service_db'
+?[0m?[0;34m2023-10-11 15:59:45.552  INFO 26672 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+?[0m?[0;34m2023-10-11 15:59:45.561  INFO 26672 --- [    Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+?[0m?[0;34m2023-10-11 15:59:45.619  INFO 26672 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+?[0m?[0;34m2023-10-11 15:59:45.619  INFO 26672 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+?[0m?[0;34m2023-10-11 15:59:45.727  INFO 26672 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6da14f7f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@c53c04e, org.springframework.security.web.context.SecurityContextPersistenceFilter@72769bf5, org.springframework.security.web.header.HeaderWriterFilter@a55b4f9, org.springframework.security.web.authentication.logout.LogoutFilter@5cc85ffc, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@189f2184, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5a63de07, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7d364bce, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@18f493d7, org.springframework.security.web.session.SessionManagementFilter@68d1f4e2, org.springframework.security.web.access.ExceptionTranslationFilter@558fa64a, org.springframework.security.web.access.intercept.AuthorizationFilter@7388d94d]
+?[0m?[0;34m2023-10-11 15:59:45.751  WARN 26672 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+?[0m?[0;34m2023-10-11 15:59:45.803  INFO 26672 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+?[0m?[0;34m2023-10-11 15:59:45.940  INFO 26672 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
+?[0m?[0;34m2023-10-11 15:59:45.962  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
+?[0m?[0;34m2023-10-11 15:59:45.970  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Started AntiFraudApplication in 1.072 seconds (JVM running for 22.122)
+?[0m?[1;31m
+Start test 14?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'After restart user must exist'
+?[0m?[0;34m-----
+?[0;34m2023-10-11 15:59:45.983  INFO 26672 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+?[0m?[0;34m2023-10-11 15:59:45.983  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+?[0m?[0;34m2023-10-11 15:59:45.985  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+?[0m?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;username&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;ADMINISTRATOR&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 2,
+?[0m?[0;34m  &quot;username&quot; : &quot;johndoe1&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;John Doe 1&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;MERCHANT&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 15?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '{
+?[0m?[0;34m   &quot;name&quot;: &quot;John Doe 1&quot;,
+?[0m?[0;34m   &quot;username&quot;: &quot;johndoe1&quot;,
+?[0m?[0;34m   &quot;password&quot;: &quot;oMoa3VvqnLxW&quot;
+?[0m?[0;34m}'
+?[0m?[0;34mExpectations: 'In case of an attempt to register an existing user, endpoint must respond with HTTP CONFLICT status (409).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 16?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '{
+?[0m?[0;34m   &quot;name&quot;: &quot;John Doe 2&quot;,
+?[0m?[0;34m   &quot;username&quot;: &quot;johndoe2&quot;,
+?[0m?[0;34m   &quot;password&quot;: &quot;oMoa5VvqnLxW&quot;
+?[0m?[0;34m}'
+?[0m?[0;34mExpectations: 'If user successfully added, endpoint must respond with HTTP CREATED status (201) '
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 17?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'Endpoint must respond with HTTP OK status (200) and body with array of objects representing the users sorted by ID in ascending order.'
+?[0m?[0;34m-----
+?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;username&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;ADMINISTRATOR&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 2,
+?[0m?[0;34m  &quot;username&quot; : &quot;johndoe1&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;John Doe 1&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;MERCHANT&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 3,
+?[0m?[0;34m  &quot;username&quot; : &quot;johndoe2&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;John Doe 2&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;MERCHANT&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 18?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 199'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'ALLOWED''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 19?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 200'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'ALLOWED''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 20?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 201'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'MANUAL_PROCESSING''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 21?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 1499'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'MANUAL_PROCESSING''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 22?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 1500'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'MANUAL_PROCESSING''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 23?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 1501'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'PROHIBITED''
+?[0m?[0;34m-----
+?[0;34m*here*
+?[0m?[0;34mfirst check
+?[0m?[0;34msecond check
+?[0m?[0;34mdelete check
+?[0m?[0;34mdone
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;amount&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;amount&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34mlast
+?[0m?[1;31m
+Start test 24?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 2000'
+?[0m?[0;34mExpectations: 'Result validating of Transaction must be 'PROHIBITED''
+?[0m?[0;34m-----
+?[0m?[0;34m*here*
+?[0m?[0;34mfirst check
+?[0m?[0;34msecond check
+?[0m?[0;34mdelete check
+?[0m?[0;34mdone
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;amount&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;amount&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34mlast
+?[0m?[1;31m
+Start test 25?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = -1'
+?[0m?[0;34mExpectations: 'Response status must be 'Bad request''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 26?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = 0'
+?[0m?[0;34mExpectations: 'Response status must be 'Bad request''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 27?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = null'
+?[0m?[0;34mExpectations: 'Response status must be 'Bad request''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 28?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = &quot;&quot;'
+?[0m?[0;34mExpectations: 'Response status must be 'Bad request''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 29?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'amount = &quot; &quot;'
+?[0m?[0;34mExpectations: 'Response status must be 'Bad request''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 30?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mrequest: 'empty body'
+?[0m?[0;34mExpectations: 'Response status must be 'Bad request''
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 31?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '/api/auth/user/somebody'
+?[0m?[0;34mExpectations: 'If a user is not found, respond with HTTP Not Found status (404).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 32?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '/api/auth/user/johndoe1'
+?[0m?[0;34mExpectations: 'The endpoint must delete the user and respond with HTTP OK status (200)'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 33?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'User 'johndoe1' must be delete'
+?[0m?[0;34m-----
+?[0m?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;username&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;ADMINISTRATOR&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 3,
+?[0m?[0;34m  &quot;username&quot; : &quot;johndoe2&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;John Doe 2&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;MERCHANT&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 34?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/role'
+?[0m?[0;34mExpectations: 'If a user is not found, endpoint must respond with the HTTP Not Found status (404).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 35?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/role'
+?[0m?[0;34mExpectations: 'If a role is not found, endpoint must respond with the HTTP Bad Request status (400).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 36?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/role'
+?[0m?[0;34mExpectations: 'If a role is ADMINISTRATOR, endpoint must respond with the HTTP Bad Request status (400).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 37?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/role'
+?[0m?[0;34mExpectations: 'If a role successfully changed, respond with the HTTP OK status (200)'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 38?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/role'
+?[0m?[0;34mExpectations: 'If a role already assigned to a user, endpoint must respond with the HTTP Conflict status (409).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 39?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/access'
+?[0m?[0;34mExpectations: 'A user johndoe2 must be UNLOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 40?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'Role for user 'johndoe2' must be changed to SUPPORT'
+?[0m?[0;34m-----
+?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;username&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;administrator&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;ADMINISTRATOR&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 3,
+?[0m?[0;34m  &quot;username&quot; : &quot;johndoe2&quot;,
+?[0m?[0;34m  &quot;name&quot; : &quot;John Doe 2&quot;,
+?[0m?[0;34m  &quot;role&quot; : &quot;SUPPORT&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 41?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'Role MERCHANT must be removed from user johndoe2!'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 42?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mrequest: '{
+?[0m?[0;34m   &quot;name&quot;: &quot;John Doe 3&quot;,
+?[0m?[0;34m   &quot;username&quot;: &quot;johndoe3&quot;,
+?[0m?[0;34m   &quot;password&quot;: &quot;oMoa6VvqnLxW&quot;
+?[0m?[0;34m}'
+?[0m?[0;34mExpectations: 'If user successfully added, endpoint must respond with HTTP CREATED status (201) '
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 43?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'MERCHANT user after registration must be LOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 44?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/access'
+?[0m?[0;34mExpectations: 'A user johndoe3 must be UNLOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 45?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'A user johndoe3 must be UNLOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 46?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/access'
+?[0m?[0;34mExpectations: 'A user johndoe3 must be LOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 47?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'A user johndoe3 must be LOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 48?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/access'
+?[0m?[0;34mExpectations: 'A user johndoe3 must be UNLOCKED'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 49?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'A user with role ADMINISTRATOR must not have access to /api/antifraud/transaction'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 50?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'A user with role SUPPORT must not have access to /api/antifraud/transaction'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 51?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'A user with role ANONYMOUS must not have access to /api/antifraud/transaction'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 52?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mExpectations: 'A user with role ANONYMOUS must not have access to DELETE /api/auth/user'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 53?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mExpectations: 'A user with role SUPPORT must not have access to DELETE /api/auth/user'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 54?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/user'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to DELETE /api/auth/user'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 55?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'A user with role ANONYMOUS must not have access to /api/auth/list'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 56?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/auth/list'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to /api/auth/list'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 57?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'A user with role ADMINISTRATOR must not have access to GET /api/antifraud/suspicious-ip'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 58?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to GET /api/antifraud/suspicious-ip'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 59?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'A user with role ADMINISTRATOR must not have access to POST /api/antifraud/suspicious-ip'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 60?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to POST /api/antifraud/suspicious-ip'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 61?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'A user with role ADMINISTRATOR must not have access to DELETE /api/antifraud/suspicious-ip'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 62?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to DELETE /api/antifraud/suspicious-ip'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 63?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A user with role ADMINISTRATOR must not have access to GET /api/antifraud/stolencard'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 64?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to GET /api/antifraud/stolencard'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 65?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A user with role ADMINISTRATOR must not have access to POST /api/antifraud/stolencard'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 66?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to POST /api/antifraud/stolencard'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 67?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A user with role ADMINISTRATOR must not have access to DELETE /api/antifraud/stolencard'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 68?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A user with role MERCHANT must not have access to DELETE /api/antifraud/stolencard'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 69?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'Endpoint must respond with empty array'
+?[0m?[0;34m-----
+?[0;34m[
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 70?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'IP must be added to Black List'
+?[0m?[0;34m-----
+?[0m?[0;34madding ip 192.168.1.66
+?[0m?[0;34m*added ip 192.168.1.66+
+?[0m?[1;31m
+Start test 71?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'If IP already in database,  endpoint must respond with the HTTP Conflict status (409).'
+?[0m?[0;34m-----
+?[0;34madding ip 192.168.1.66
+?[0m?[1;31m
+Start test 72?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'If IP doesn't have right format, respond with HTTP Bad Request status (400)'
+?[0m?[0;34m-----
+?[0;34madding ip 192.168.351.66
+?[0m?[1;31m
+Start test 73?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'If IP doesn't have right format, respond with HTTP Bad Request status (400)'
+?[0m?[0;34m-----
+?[0m?[0;34madding ip 192.168.1.
+?[0m?[1;31m
+Start test 74?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'IP must be added to Black List'
+?[0m?[0;34m-----
+?[0m?[0;34madding ip 192.168.1.67
+?[0m?[0;34m*added ip 192.168.1.67+
+?[0m?[1;31m
+Start test 75?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'Endpoint must responds with Black List'
+?[0m?[0;34m-----
+?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;ip&quot; : &quot;192.168.1.66&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 2,
+?[0m?[0;34m  &quot;ip&quot; : &quot;192.168.1.67&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 76?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'IP must be removed from Black List'
+?[0m?[0;34m-----
+?[0;34mremoving ip 192.168.1.66
+?[0m?[1;31m
+Start test 77?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'If IP not found in database, respond with the HTTP Not Found status (404).'
+?[0m?[0;34m-----
+?[0m?[0;34mremoving ip 192.168.1.66
+?[0m?[1;31m
+Start test 78?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'If IP doesn't have right format, respond with HTTP Bad Request status (400)'
+?[0m?[0;34m-----
+?[0;34mremoving ip 192.168.1.
+?[0m?[1;31m
+Start test 79?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/suspicious-ip'
+?[0m?[0;34mExpectations: 'IP must be removed from Black List'
+?[0m?[0;34m-----
+?[0m?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 2,
+?[0m?[0;34m  &quot;ip&quot; : &quot;192.168.1.67&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 80?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'Endpoint must respond with empty array'
+?[0m?[0;34m-----
+?[0m?[0;34m[
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 81?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A card must be added to Black List'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 82?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'If card-number already in database, endpoint must respond with the HTTP Conflict status (409).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 83?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'If card-number doesn't have right format, endpoint must respond with HTTP Bad Request status (400).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 84?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'If checksum of card-number is wrong, endpoint must respond with HTTP Bad Request status (400).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 85?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'A card must be added to Black List'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 86?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'Endpoint must responds with Black List'
+?[0m?[0;34m-----
+?[0m?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 1,
+?[0m?[0;34m  &quot;number&quot; : &quot;4000003305061034&quot;
+?[0m?[0;34m},{
+?[0m?[0;34m  &quot;id&quot; : 2,
+?[0m?[0;34m  &quot;number&quot; : &quot;4000003305160034&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 87?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'Card must be removed from Black List'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 88?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'If card-number not found in database, respond with the HTTP Not Found status (404).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 89?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'If card-number doesn't have right format, endpoint must respond with HTTP Bad Request status (400).'
+?[0m?[0;34m-----
+?[0m?[1;31m
+Start test 90?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/stolencard'
+?[0m?[0;34mExpectations: 'Card must be removed from Black List'
+?[0m?[0;34m-----
+?[0m?[0;34m[
+?[0m?[0;34m{
+?[0m?[0;34m  &quot;id&quot; : 2,
+?[0m?[0;34m  &quot;number&quot; : &quot;4000003305160034&quot;
+?[0m?[0;34m}
+?[0m?[0;34m]
+?[0m?[1;31m
+Start test 91?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'Transaction must be PROHIBITED due to - suspicious ip reason'
+?[0m?[0;34m-----
+?[0m?[0;34m*here*
+?[0m?[0;34mfirst check
+?[0m?[0;34msecond check
+?[0m?[0;34mdelete check
+?[0m?[0;34mdone
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;ip&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;ip&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34mlast
+?[0m?[1;31m
+Start test 92?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'Transaction must be PROHIBITED due to - stolen card reason'
+?[0m?[0;34m-----
+?[0m?[0;34m*here*
+?[0m?[0;34mfirst check
+?[0m?[0;34msecond check
+?[0m?[0;34mdelete check
+?[0m?[0;34mdone
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;card-number&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;card-number&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34mlast
+?[0m?[1;31m
+Start test 93?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'Transaction must be PROHIBITED due to - stolen card, suspicious ip reasons'
+?[0m?[0;34m-----
+?[0m?[0;34m*here*
+?[0m?[0;34mfirst check
+?[0m?[0;34msecond check
+?[0m?[0;34mdelete check
+?[0m?[0;34mdone
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;card-number, ip&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;card-number, ip&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34mlast
+?[0m?[1;31m
+Start test 94?[0m
+?[0;34mTest case
+?[0m?[0;34mTesting api: '/api/antifraud/transaction'
+?[0m?[0;34mExpectations: 'Transaction must be PROHIBITED due to - amount, stolen card, suspicious ip reasons'
+?[0m?[0;34m-----
+?[0m?[0;34m*here*
+?[0m?[0;34mfirst check
+?[0m?[0;34msecond check
+?[0m?[0;34mdelete check
+?[0m?[0;34mdone
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;amount, card-number, ip&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34m    {
+?[0m?[0;34m      &quot;result&quot;: &quot;PROHIBITED&quot;,
+?[0m?[0;34m      &quot;info&quot;: &quot;amount, card-number, ip&quot;
+?[0m?[0;34m    }
+?[0m?[0;34m
+?[0m?[0;34mlast
+?[0m</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 7.6</a> at 11 Oct 2023, 15:59:52</p>
+</div>
+</div>
+</body>
+</html>
