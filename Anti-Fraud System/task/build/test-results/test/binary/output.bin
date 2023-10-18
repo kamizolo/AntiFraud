@@ -1,36 +1,36 @@
 [1;31m
 Start test 1[0m
-:[0;34m __    __   __          __    __       _______. __
-?[0m[0;34m|  |  |  | |  |        |  |  |  |     /       ||  |
-?[0m[0;34m|  |__|  | |  |        |  |__|  |    |   (----`|  |
-?[0m[0;34m|   __   | |  |        |   __   |     \   \    |  |
-?[0m[0;34m|  |  |  | |  |  __    |  |  |  | .----)   |   |__|
-?[0m[0;34m|__|  |__| |__| (_ )   |__|  |__| |_______/    (__)
+;[0;34m __    __   __          __    __       _______. __
+@[0m[0;34m|  |  |  | |  |        |  |  |  |     /       ||  |
+@[0m[0;34m|  |__|  | |  |        |  |__|  |    |   (----`|  |
+@[0m[0;34m|   __   | |  |        |   __   |     \   \    |  |
+@[0m[0;34m|  |  |  | |  |  __    |  |  |  | .----)   |   |__|
+@[0m[0;34m|__|  |__| |__| (_ )   |__|  |__| |_______/    (__)
 [0m[0;34mlorenzo
-õ[0m[0;34m2023-10-11 15:59:25.714  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Starting AntiFraudApplication using Java 17.0.6 on Kamizolo with PID 26672 (started by Lorenzo in C:\Users\Lorenzo\Documents\Hyperskill\Anti-Fraud\Anti-Fraud System\task)
-¥[0m[0;34m2023-10-11 15:59:25.721  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : No active profile set, falling back to 1 default profile: "default"
-¨[0m[0;34m2023-10-11 15:59:27.215  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-∆[0m[0;34m2023-10-11 15:59:27.290  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 61 ms. Found 3 JPA repository interfaces.
-û[0m[0;34m2023-10-11 15:59:28.284  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
-ä[0m[0;34m2023-10-11 15:59:28.302  INFO 26672 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-†[0m[0;34m2023-10-11 15:59:28.303  INFO 26672 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.65]
-£[0m[0;34m2023-10-11 15:59:28.437  INFO 26672 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-∞[0m[0;34m2023-10-11 15:59:28.437  INFO 26672 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2645 ms
-ã[0m[0;34m2023-10-11 15:59:28.643  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-ê[0m[0;34m2023-10-11 15:59:28.994  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-¬[0m[0;34m2023-10-11 15:59:29.025  INFO 26672 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2'. Database available at 'jdbc:h2:file:../service_db'
-™[0m[0;34m2023-10-11 15:59:29.257  INFO 26672 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-£[0m[0;34m2023-10-11 15:59:29.344  INFO 26672 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.11.Final
-©[0m[0;34m2023-10-11 15:59:29.632  INFO 26672 --- [    Test worker] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
-™[0m[0;34m2023-10-11 15:59:29.815  INFO 26672 --- [    Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
-‰[0m[0;34m2023-10-11 15:59:30.696  INFO 26672 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-¥[0m[0;34m2023-10-11 15:59:30.706  INFO 26672 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-‰[0m[0;34m2023-10-11 15:59:31.463  INFO 26672 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1c7fd2e0, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@41831611, org.springframework.security.web.context.SecurityContextPersistenceFilter@e2696e8, org.springframework.security.web.header.HeaderWriterFilter@232be28d, org.springframework.security.web.authentication.logout.LogoutFilter@567baa55, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@38f569d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@70cdbd18, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@40696fc6, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@31921151, org.springframework.security.web.session.SessionManagementFilter@13552290, org.springframework.security.web.access.ExceptionTranslationFilter@81cd90e, org.springframework.security.web.access.intercept.AuthorizationFilter@7095b688]
-®[0m[0;34m2023-10-11 15:59:31.515  WARN 26672 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-≠[0m[0;34m2023-10-11 15:59:31.723  INFO 26672 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
-¶[0m[0;34m2023-10-11 15:59:32.203  INFO 26672 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
-≠[0m[0;34m2023-10-11 15:59:32.252  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
-µ[0m[0;34m2023-10-11 15:59:32.266  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Started AntiFraudApplication in 7.15 seconds (JVM running for 8.418)
+ô[0m[0;34m2023-10-18 19:57:59.178  INFO 5376 --- [    Test worker] antifraud.AntiFraudApplication           : Starting AntiFraudApplication using Java 17.0.6 on Kamizolo with PID 5376 (started by Lorenzo in C:\Users\Lorenzo\Documents\Hyperskill\Anti-Fraud\Anti-Fraud System\task)
+≥[0m[0;34m2023-10-18 19:57:59.184  INFO 5376 --- [    Test worker] antifraud.AntiFraudApplication           : No active profile set, falling back to 1 default profile: "default"
+´[0m[0;34m2023-10-18 19:58:00.495  INFO 5376 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+≈[0m[0;34m2023-10-18 19:58:00.564  INFO 5376 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 58 ms. Found 4 JPA repository interfaces.
+ù[0m[0;34m2023-10-18 19:58:01.431  INFO 5376 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
+â[0m[0;34m2023-10-18 19:58:01.445  INFO 5376 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+ü[0m[0;34m2023-10-18 19:58:01.446  INFO 5376 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.65]
+¢[0m[0;34m2023-10-18 19:58:01.569  INFO 5376 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+Ø[0m[0;34m2023-10-18 19:58:01.569  INFO 5376 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2330 ms
+ä[0m[0;34m2023-10-18 19:58:01.764  INFO 5376 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+è[0m[0;34m2023-10-18 19:58:02.107  INFO 5376 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+¡[0m[0;34m2023-10-18 19:58:02.133  INFO 5376 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2'. Database available at 'jdbc:h2:file:../service_db'
+©[0m[0;34m2023-10-18 19:58:02.366  INFO 5376 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+¢[0m[0;34m2023-10-18 19:58:02.464  INFO 5376 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.11.Final
+®[0m[0;34m2023-10-18 19:58:02.740  INFO 5376 --- [    Test worker] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+©[0m[0;34m2023-10-18 19:58:02.939  INFO 5376 --- [    Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+„[0m[0;34m2023-10-18 19:58:03.840  INFO 5376 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+≥[0m[0;34m2023-10-18 19:58:03.852  INFO 5376 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+Â[0m[0;34m2023-10-18 19:58:04.637  INFO 5376 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@956cf3d, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@712213ed, org.springframework.security.web.context.SecurityContextPersistenceFilter@643a73fa, org.springframework.security.web.header.HeaderWriterFilter@769a9b7a, org.springframework.security.web.authentication.logout.LogoutFilter@1372696b, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@47d7e4b6, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2686a801, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4ef10d3b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@58189132, org.springframework.security.web.session.SessionManagementFilter@49741e80, org.springframework.security.web.access.ExceptionTranslationFilter@36696821, org.springframework.security.web.access.intercept.AuthorizationFilter@744199bb]
+ß[0m[0;34m2023-10-18 19:58:04.688  WARN 5376 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+¨[0m[0;34m2023-10-18 19:58:04.898  INFO 5376 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+•[0m[0;34m2023-10-18 19:58:05.378  INFO 5376 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
+¨[0m[0;34m2023-10-18 19:58:05.431  INFO 5376 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
+µ[0m[0;34m2023-10-18 19:58:05.446  INFO 5376 --- [    Test worker] antifraud.AntiFraudApplication           : Started AntiFraudApplication in 6.786 seconds (JVM running for 7.806)
 [0m[0;34mTest case
 )[0m[0;34mTesting api: '/api/auth/user'
 [0m[0;34mrequest: '{
@@ -39,9 +39,9 @@
 [0m[0;34m}'
 s[0m[0;34mExpectations: 'In case of wrong data in request, endpoint must respond with BAD REQUEST  status (400).'
 [0m[0;34m-----
-¶[0;34m2023-10-11 15:59:32.653  INFO 26672 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-ô[0m[0;34m2023-10-11 15:59:32.654  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-ë[0m[0;34m2023-10-11 15:59:32.655  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+•[0;34m2023-10-18 19:58:05.837  INFO 5376 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+ò[0m[0;34m2023-10-18 19:58:05.838  INFO 5376 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+ê[0m[0;34m2023-10-18 19:58:05.840  INFO 5376 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
 [0m[1;31m
 Start test 2[0m
 [0;34mTest case
@@ -137,6 +137,8 @@
 5[0m[0;34mTesting api: '/api/antifraud/transaction'
 <[0m[0;34mExpectations: 'A user johndoe1 must be UNLOCKED'
 [0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
+[0m[0;34mResult is: ALLOWED
 [0m[1;31m
 Start test 12[0m
 [0;34mTest case
@@ -144,51 +146,53 @@
 ![0m[0;34mrequest: 'amount = 1'
 N[0m[0;34mExpectations: 'Result validating of Transaction must be 'ALLOWED''
 [0m[0;34m-----
+m[0;34mtransaction[amount=1, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
+[0m[0;34mResult is: ALLOWED
 [0m[1;31m
 Start test 13[0m
-Ü[0;34m2023-10-11 15:59:34.554  INFO 26672 --- [       Thread-5] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
-ß[0m[0;34m2023-10-11 15:59:34.556  INFO 26672 --- [       Thread-5] o.a.c.c.C.[Tomcat].[localhost].[/]       : Destroying Spring FrameworkServlet 'dispatcherServlet'
-∞[0m[0;34m2023-10-11 15:59:34.566  INFO 26672 --- [       Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-ï[0m[0;34m2023-10-11 15:59:34.569  INFO 26672 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-ì[0m[0;34m2023-10-11 15:59:34.588  INFO 26672 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-:[0;34m __    __   __          __    __       _______. __
-?[0m[0;34m|  |  |  | |  |        |  |  |  |     /       ||  |
-?[0m[0;34m|  |__|  | |  |        |  |__|  |    |   (----`|  |
-?[0m[0;34m|   __   | |  |        |   __   |     \   \    |  |
-?[0m[0;34m|  |  |  | |  |  __    |  |  |  | .----)   |   |__|
-?[0m[0;34m|__|  |__| |__| (_ )   |__|  |__| |_______/    (__)
+Ö[0;34m2023-10-18 19:58:07.798  INFO 5376 --- [       Thread-5] o.apache.catalina.core.StandardService   : Stopping service [Tomcat]
+¶[0m[0;34m2023-10-18 19:58:07.801  INFO 5376 --- [       Thread-5] o.a.c.c.C.[Tomcat].[localhost].[/]       : Destroying Spring FrameworkServlet 'dispatcherServlet'
+Ø[0m[0;34m2023-10-18 19:58:07.810  INFO 5376 --- [       Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+î[0m[0;34m2023-10-18 19:58:07.814  INFO 5376 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+í[0m[0;34m2023-10-18 19:58:07.834  INFO 5376 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+;[0;34m __    __   __          __    __       _______. __
+@[0m[0;34m|  |  |  | |  |        |  |  |  |     /       ||  |
+@[0m[0;34m|  |__|  | |  |        |  |__|  |    |   (----`|  |
+@[0m[0;34m|   __   | |  |        |   __   |     \   \    |  |
+@[0m[0;34m|  |  |  | |  |  __    |  |  |  | .----)   |   |__|
+@[0m[0;34m|__|  |__| |__| (_ )   |__|  |__| |_______/    (__)
 [0m[0;34mlorenzo
-õ[0m[0;34m2023-10-11 15:59:44.929  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Starting AntiFraudApplication using Java 17.0.6 on Kamizolo with PID 26672 (started by Lorenzo in C:\Users\Lorenzo\Documents\Hyperskill\Anti-Fraud\Anti-Fraud System\task)
-¥[0m[0;34m2023-10-11 15:59:44.930  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : No active profile set, falling back to 1 default profile: "default"
-¨[0m[0;34m2023-10-11 15:59:45.279  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-∆[0m[0;34m2023-10-11 15:59:45.294  INFO 26672 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 14 ms. Found 3 JPA repository interfaces.
-û[0m[0;34m2023-10-11 15:59:45.392  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
-ä[0m[0;34m2023-10-11 15:59:45.393  INFO 26672 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-†[0m[0;34m2023-10-11 15:59:45.394  INFO 26672 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.65]
-£[0m[0;34m2023-10-11 15:59:45.428  INFO 26672 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-Ø[0m[0;34m2023-10-11 15:59:45.428  INFO 26672 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 495 ms
-ã[0m[0;34m2023-10-11 15:59:45.474  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
-ê[0m[0;34m2023-10-11 15:59:45.500  INFO 26672 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
-¬[0m[0;34m2023-10-11 15:59:45.501  INFO 26672 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2'. Database available at 'jdbc:h2:file:../service_db'
-™[0m[0;34m2023-10-11 15:59:45.552  INFO 26672 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-™[0m[0;34m2023-10-11 15:59:45.561  INFO 26672 --- [    Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
-‰[0m[0;34m2023-10-11 15:59:45.619  INFO 26672 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-¥[0m[0;34m2023-10-11 15:59:45.619  INFO 26672 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-Â[0m[0;34m2023-10-11 15:59:45.727  INFO 26672 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6da14f7f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@c53c04e, org.springframework.security.web.context.SecurityContextPersistenceFilter@72769bf5, org.springframework.security.web.header.HeaderWriterFilter@a55b4f9, org.springframework.security.web.authentication.logout.LogoutFilter@5cc85ffc, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@189f2184, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5a63de07, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7d364bce, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@18f493d7, org.springframework.security.web.session.SessionManagementFilter@68d1f4e2, org.springframework.security.web.access.ExceptionTranslationFilter@558fa64a, org.springframework.security.web.access.intercept.AuthorizationFilter@7388d94d]
-®[0m[0;34m2023-10-11 15:59:45.751  WARN 26672 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-≠[0m[0;34m2023-10-11 15:59:45.803  INFO 26672 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
-¶[0m[0;34m2023-10-11 15:59:45.940  INFO 26672 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
-≠[0m[0;34m2023-10-11 15:59:45.962  INFO 26672 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
-∑[0m[0;34m2023-10-11 15:59:45.970  INFO 26672 --- [    Test worker] antifraud.AntiFraudApplication           : Started AntiFraudApplication in 1.072 seconds (JVM running for 22.122)
+ô[0m[0;34m2023-10-18 19:58:18.174  INFO 5376 --- [    Test worker] antifraud.AntiFraudApplication           : Starting AntiFraudApplication using Java 17.0.6 on Kamizolo with PID 5376 (started by Lorenzo in C:\Users\Lorenzo\Documents\Hyperskill\Anti-Fraud\Anti-Fraud System\task)
+≥[0m[0;34m2023-10-18 19:58:18.174  INFO 5376 --- [    Test worker] antifraud.AntiFraudApplication           : No active profile set, falling back to 1 default profile: "default"
+´[0m[0;34m2023-10-18 19:58:18.525  INFO 5376 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+≈[0m[0;34m2023-10-18 19:58:18.544  INFO 5376 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 17 ms. Found 4 JPA repository interfaces.
+ù[0m[0;34m2023-10-18 19:58:18.652  INFO 5376 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
+â[0m[0;34m2023-10-18 19:58:18.653  INFO 5376 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+ü[0m[0;34m2023-10-18 19:58:18.654  INFO 5376 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.65]
+¢[0m[0;34m2023-10-18 19:58:18.687  INFO 5376 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+Æ[0m[0;34m2023-10-18 19:58:18.687  INFO 5376 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 510 ms
+ä[0m[0;34m2023-10-18 19:58:18.735  INFO 5376 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+è[0m[0;34m2023-10-18 19:58:18.756  INFO 5376 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+¡[0m[0;34m2023-10-18 19:58:18.756  INFO 5376 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2'. Database available at 'jdbc:h2:file:../service_db'
+©[0m[0;34m2023-10-18 19:58:18.805  INFO 5376 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+©[0m[0;34m2023-10-18 19:58:18.815  INFO 5376 --- [    Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+„[0m[0;34m2023-10-18 19:58:18.884  INFO 5376 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+≥[0m[0;34m2023-10-18 19:58:18.884  INFO 5376 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+Ê[0m[0;34m2023-10-18 19:58:18.990  INFO 5376 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@6237927a, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@2b9bacb8, org.springframework.security.web.context.SecurityContextPersistenceFilter@1b3a1e42, org.springframework.security.web.header.HeaderWriterFilter@2b3ac26d, org.springframework.security.web.authentication.logout.LogoutFilter@6ea4b4b2, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@371fdf43, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@41030c21, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3c5797c6, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2850fe85, org.springframework.security.web.session.SessionManagementFilter@13515709, org.springframework.security.web.access.ExceptionTranslationFilter@58f05266, org.springframework.security.web.access.intercept.AuthorizationFilter@297da2c3]
+ß[0m[0;34m2023-10-18 19:58:19.016  WARN 5376 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+¨[0m[0;34m2023-10-18 19:58:19.071  INFO 5376 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+•[0m[0;34m2023-10-18 19:58:19.202  INFO 5376 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
+¨[0m[0;34m2023-10-18 19:58:19.221  INFO 5376 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
+∂[0m[0;34m2023-10-18 19:58:19.227  INFO 5376 --- [    Test worker] antifraud.AntiFraudApplication           : Started AntiFraudApplication in 1.081 seconds (JVM running for 21.587)
 [0m[1;31m
 Start test 14[0m
 [0;34mTest case
 )[0m[0;34mTesting api: '/api/auth/list'
 9[0m[0;34mExpectations: 'After restart user must exist'
 [0m[0;34m-----
-¶[0;34m2023-10-11 15:59:45.983  INFO 26672 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-ô[0m[0;34m2023-10-11 15:59:45.983  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-ë[0m[0;34m2023-10-11 15:59:45.985  INFO 26672 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+•[0;34m2023-10-18 19:58:19.233  INFO 5376 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+ò[0m[0;34m2023-10-18 19:58:19.234  INFO 5376 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+ê[0m[0;34m2023-10-18 19:58:19.235  INFO 5376 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 [0m[0;34m[
 [0m[0;34m{
 [0m[0;34m  "id" : 1,
@@ -255,6 +259,8 @@
 #[0m[0;34mrequest: 'amount = 199'
 N[0m[0;34mExpectations: 'Result validating of Transaction must be 'ALLOWED''
 [0m[0;34m-----
+o[0;34mtransaction[amount=199, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:01:00]
+[0m[0;34mResult is: ALLOWED
 [0m[1;31m
 Start test 19[0m
 [0;34mTest case
@@ -262,6 +268,8 @@
 #[0m[0;34mrequest: 'amount = 200'
 N[0m[0;34mExpectations: 'Result validating of Transaction must be 'ALLOWED''
 [0m[0;34m-----
+o[0;34mtransaction[amount=200, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:02:00]
+[0m[0;34mResult is: ALLOWED
 [0m[1;31m
 Start test 20[0m
 [0;34mTest case
@@ -269,6 +277,13 @@
 #[0m[0;34mrequest: 'amount = 201'
 X[0m[0;34mExpectations: 'Result validating of Transaction must be 'MANUAL_PROCESSING''
 [0m[0;34m-----
+o[0;34mtransaction[amount=201, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:03:00]
+)[0m[0;34mResult is: MANUAL_PROCESSING
+[0m[0;34m****    {
+0[0m[0;34m      "result": "MANUAL_PROCESSING",
+"[0m[0;34m      "info": "amount"
+[0m[0;34m    }
+[0m[0;34m****
 [0m[1;31m
 Start test 21[0m
 [0;34mTest case
@@ -276,6 +291,13 @@
 $[0m[0;34mrequest: 'amount = 1499'
 X[0m[0;34mExpectations: 'Result validating of Transaction must be 'MANUAL_PROCESSING''
 [0m[0;34m-----
+p[0;34mtransaction[amount=1499, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:04:00]
+)[0m[0;34mResult is: MANUAL_PROCESSING
+[0m[0;34m****    {
+0[0m[0;34m      "result": "MANUAL_PROCESSING",
+"[0m[0;34m      "info": "amount"
+[0m[0;34m    }
+[0m[0;34m****
 [0m[1;31m
 Start test 22[0m
 [0;34mTest case
@@ -283,6 +305,13 @@
 $[0m[0;34mrequest: 'amount = 1500'
 X[0m[0;34mExpectations: 'Result validating of Transaction must be 'MANUAL_PROCESSING''
 [0m[0;34m-----
+p[0;34mtransaction[amount=1500, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:05:00]
+)[0m[0;34mResult is: MANUAL_PROCESSING
+[0m[0;34m****    {
+0[0m[0;34m      "result": "MANUAL_PROCESSING",
+"[0m[0;34m      "info": "amount"
+[0m[0;34m    }
+[0m[0;34m****
 [0m[1;31m
 Start test 23[0m
 [0;34mTest case
@@ -290,22 +319,13 @@
 $[0m[0;34mrequest: 'amount = 1501'
 Q[0m[0;34mExpectations: 'Result validating of Transaction must be 'PROHIBITED''
 [0m[0;34m-----
-[0;34m*here*
-[0m[0;34mfirst check
-[0m[0;34msecond check
-[0m[0;34mdelete check
-[0m[0;34mdone
-[0m[0;34m    {
+p[0;34mtransaction[amount=1501, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:06:00]
+"[0m[0;34mResult is: PROHIBITED
+[0m[0;34m****    {
 )[0m[0;34m      "result": "PROHIBITED",
 "[0m[0;34m      "info": "amount"
 [0m[0;34m    }
-[0m[0;34m
-[0m[0;34m    {
-)[0m[0;34m      "result": "PROHIBITED",
-"[0m[0;34m      "info": "amount"
-[0m[0;34m    }
-[0m[0;34m
-[0m[0;34mlast
+[0m[0;34m****
 [0m[1;31m
 Start test 24[0m
 [0;34mTest case
@@ -313,22 +333,13 @@
 $[0m[0;34mrequest: 'amount = 2000'
 Q[0m[0;34mExpectations: 'Result validating of Transaction must be 'PROHIBITED''
 [0m[0;34m-----
-[0m[0;34m*here*
-[0m[0;34mfirst check
-[0m[0;34msecond check
-[0m[0;34mdelete check
-[0m[0;34mdone
-[0m[0;34m    {
+t[0m[0;34mtransaction[amount=2000, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:07:00]
+"[0m[0;34mResult is: PROHIBITED
+[0m[0;34m****    {
 )[0m[0;34m      "result": "PROHIBITED",
 "[0m[0;34m      "info": "amount"
 [0m[0;34m    }
-[0m[0;34m
-[0m[0;34m    {
-)[0m[0;34m      "result": "PROHIBITED",
-"[0m[0;34m      "info": "amount"
-[0m[0;34m    }
-[0m[0;34m
-[0m[0;34mlast
+[0m[0;34m****
 [0m[1;31m
 Start test 25[0m
 [0;34mTest case
@@ -336,6 +347,7 @@
 "[0m[0;34mrequest: 'amount = -1'
 A[0m[0;34mExpectations: 'Response status must be 'Bad request''
 [0m[0;34m-----
+n[0;34mtransaction[amount=-1, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
 [0m[1;31m
 Start test 26[0m
 [0;34mTest case
@@ -343,6 +355,7 @@
 ![0m[0;34mrequest: 'amount = 0'
 A[0m[0;34mExpectations: 'Response status must be 'Bad request''
 [0m[0;34m-----
+m[0;34mtransaction[amount=0, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
 [0m[1;31m
 Start test 27[0m
 [0;34mTest case
@@ -350,6 +363,8 @@
 $[0m[0;34mrequest: 'amount = null'
 A[0m[0;34mExpectations: 'Response status must be 'Bad request''
 [0m[0;34m-----
+t[0m[0;34mtransaction[amount=null, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
+F[0m[0;34mjava.lang.NumberFormatException: Cannot parse null string
 [0m[1;31m
 Start test 28[0m
 [0;34mTest case
@@ -357,6 +372,8 @@
 "[0m[0;34mrequest: 'amount = ""'
 A[0m[0;34mExpectations: 'Response status must be 'Bad request''
 [0m[0;34m-----
+q[0m[0;34mtransaction[amount= , ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
+C[0m[0;34mjava.lang.NumberFormatException: For input string: " "
 [0m[1;31m
 Start test 29[0m
 [0;34mTest case
@@ -364,6 +381,8 @@
 #[0m[0;34mrequest: 'amount = " "'
 A[0m[0;34mExpectations: 'Response status must be 'Bad request''
 [0m[0;34m-----
+p[0m[0;34mtransaction[amount=, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
+B[0m[0;34mjava.lang.NumberFormatException: For input string: ""
 [0m[1;31m
 Start test 30[0m
 [0;34mTest case
@@ -371,6 +390,8 @@
 ![0m[0;34mrequest: 'empty body'
 A[0m[0;34mExpectations: 'Response status must be 'Bad request''
 [0m[0;34m-----
+S[0m[0;34mtransaction[amount=null, ip=null, number=null, region=null, date=null]
+F[0m[0;34mjava.lang.NumberFormatException: Cannot parse null string
 [0m[1;31m
 Start test 31[0m
 [0;34mTest case
@@ -446,7 +467,7 @@
 )[0m[0;34mTesting api: '/api/auth/list'
 O[0m[0;34mExpectations: 'Role for user 'johndoe2' must be changed to SUPPORT'
 [0m[0;34m-----
-	[0;34m[
+[0m[0;34m[
 [0m[0;34m{
 [0m[0;34m  "id" : 1,
 +[0m[0;34m  "username" : "administrator",
@@ -494,6 +515,8 @@
 5[0m[0;34mTesting api: '/api/antifraud/transaction'
 <[0m[0;34mExpectations: 'A user johndoe3 must be UNLOCKED'
 [0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.1, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
+[0m[0;34mResult is: ALLOWED
 [0m[1;31m
 Start test 46[0m
 [0;34mTest case
@@ -638,7 +661,7 @@
 7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
 B[0m[0;34mExpectations: 'Endpoint must respond with empty array'
 [0m[0;34m-----
-	[0;34m[
+[0m[0;34m[
 [0m[0;34m]
 [0m[1;31m
 Start test 70[0m
@@ -654,14 +677,14 @@
 7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
 r[0m[0;34mExpectations: 'If IP already in database,  endpoint must respond with the HTTP Conflict status (409).'
 [0m[0;34m-----
-[0;34madding ip 192.168.1.66
+#[0m[0;34madding ip 192.168.1.66
 [0m[1;31m
 Start test 72[0m
 [0;34mTest case
 7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
 g[0m[0;34mExpectations: 'If IP doesn't have right format, respond with HTTP Bad Request status (400)'
 [0m[0;34m-----
-![0;34madding ip 192.168.351.66
+%[0m[0;34madding ip 192.168.351.66
 [0m[1;31m
 Start test 73[0m
 [0;34mTest case
@@ -683,7 +706,7 @@
 7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
 B[0m[0;34mExpectations: 'Endpoint must responds with Black List'
 [0m[0;34m-----
-	[0;34m[
+[0m[0;34m[
 [0m[0;34m{
 [0m[0;34m  "id" : 1,
 #[0m[0;34m  "ip" : "192.168.1.66"
@@ -698,7 +721,7 @@
 7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
 >[0m[0;34mExpectations: 'IP must be removed from Black List'
 [0m[0;34m-----
-![0;34mremoving ip 192.168.1.66
+%[0m[0;34mremoving ip 192.168.1.66
 [0m[1;31m
 Start test 77[0m
 [0;34mTest case
@@ -712,7 +735,7 @@
 7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
 g[0m[0;34mExpectations: 'If IP doesn't have right format, respond with HTTP Bad Request status (400)'
 [0m[0;34m-----
-[0;34mremoving ip 192.168.1.
+#[0m[0;34mremoving ip 192.168.1.
 [0m[1;31m
 Start test 79[0m
 [0;34mTest case
@@ -814,86 +837,236 @@
 5[0m[0;34mTesting api: '/api/antifraud/transaction'
 X[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - suspicious ip reason'
 [0m[0;34m-----
-[0m[0;34m*here*
-[0m[0;34mfirst check
-[0m[0;34msecond check
-[0m[0;34mdelete check
-[0m[0;34mdone
-[0m[0;34m    {
+u[0m[0;34mtransaction[amount=1000, ip=192.168.1.67, number=4000008449433403, region=EAP, date=2022-01-22T16:00:00]
+)[0m[0;34mResult is: MANUAL_PROCESSING
+[0m[0;34m****    {
 )[0m[0;34m      "result": "PROHIBITED",
 [0m[0;34m      "info": "ip"
 [0m[0;34m    }
-[0m[0;34m
-[0m[0;34m    {
-)[0m[0;34m      "result": "PROHIBITED",
-[0m[0;34m      "info": "ip"
-[0m[0;34m    }
-[0m[0;34m
-[0m[0;34mlast
+[0m[0;34m****
 [0m[1;31m
 Start test 92[0m
 [0;34mTest case
 5[0m[0;34mTesting api: '/api/antifraud/transaction'
 V[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - stolen card reason'
 [0m[0;34m-----
-[0m[0;34m*here*
-[0m[0;34mfirst check
-[0m[0;34msecond check
-[0m[0;34mdelete check
-[0m[0;34mdone
-[0m[0;34m    {
+t[0m[0;34mtransaction[amount=1000, ip=192.168.1.1, number=4000003305160034, region=EAP, date=2022-01-22T16:00:00]
+)[0m[0;34mResult is: MANUAL_PROCESSING
+[0m[0;34m****    {
 )[0m[0;34m      "result": "PROHIBITED",
 '[0m[0;34m      "info": "card-number"
 [0m[0;34m    }
-[0m[0;34m
-[0m[0;34m    {
-)[0m[0;34m      "result": "PROHIBITED",
-'[0m[0;34m      "info": "card-number"
-[0m[0;34m    }
-[0m[0;34m
-[0m[0;34mlast
+[0m[0;34m****
 [0m[1;31m
 Start test 93[0m
 [0;34mTest case
 5[0m[0;34mTesting api: '/api/antifraud/transaction'
 f[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - stolen card, suspicious ip reasons'
 [0m[0;34m-----
-[0m[0;34m*here*
-[0m[0;34mfirst check
-[0m[0;34msecond check
-[0m[0;34mdelete check
-[0m[0;34mdone
-[0m[0;34m    {
+u[0m[0;34mtransaction[amount=1000, ip=192.168.1.67, number=4000003305160034, region=EAP, date=2022-01-22T16:00:00]
+)[0m[0;34mResult is: MANUAL_PROCESSING
+[0m[0;34m****    {
 )[0m[0;34m      "result": "PROHIBITED",
 +[0m[0;34m      "info": "card-number, ip"
 [0m[0;34m    }
-[0m[0;34m
-[0m[0;34m    {
-)[0m[0;34m      "result": "PROHIBITED",
-+[0m[0;34m      "info": "card-number, ip"
-[0m[0;34m    }
-[0m[0;34m
-[0m[0;34mlast
+[0m[0;34m****
 [0m[1;31m
 Start test 94[0m
 [0;34mTest case
 5[0m[0;34mTesting api: '/api/antifraud/transaction'
 n[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - amount, stolen card, suspicious ip reasons'
 [0m[0;34m-----
-[0m[0;34m*here*
-[0m[0;34mfirst check
-[0m[0;34msecond check
-[0m[0;34mdelete check
-[0m[0;34mdone
-[0m[0;34m    {
+u[0m[0;34mtransaction[amount=2000, ip=192.168.1.67, number=4000003305160034, region=EAP, date=2022-01-22T16:00:00]
+"[0m[0;34mResult is: PROHIBITED
+[0m[0;34m****    {
 )[0m[0;34m      "result": "PROHIBITED",
 3[0m[0;34m      "info": "amount, card-number, ip"
 [0m[0;34m    }
-[0m[0;34m
-[0m[0;34m    {
-)[0m[0;34m      "result": "PROHIBITED",
-3[0m[0;34m      "info": "amount, card-number, ip"
+[0m[0;34m****
+[0m[1;31m
+Start test 95[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+7[0m[0;34mExpectations: 'Transaction must be ALLOWED'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.2, number=4000008449433403, region=EAP, date=2022-01-22T17:10:00]
+[0m[0;34mResult is: ALLOWED
+[0m[1;31m
+Start test 96[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+7[0m[0;34mExpectations: 'Transaction must be ALLOWED'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.3, number=4000008449433403, region=EAP, date=2022-01-22T17:11:00]
+[0m[0;34mResult is: ALLOWED
+[0m[1;31m
+Start test 97[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+7[0m[0;34mExpectations: 'Transaction must be ALLOWED'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.3, number=4000008449433403, region=EAP, date=2022-01-22T17:12:00]
+[0m[0;34mResult is: ALLOWED
+[0m[1;31m
+Start test 98[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+^[0m[0;34mExpectations: 'Transaction must be MANUAL_PROCESSING due to - ip correlation rule'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.4, number=4000008449433403, region=EAP, date=2022-01-22T17:12:00]
+[0m[0;34mResult is: ALLOWED
+[0m[0;34m****    {
+0[0m[0;34m      "result": "MANUAL_PROCESSING",
+*[0m[0;34m      "info": "ip-correlation"
 [0m[0;34m    }
-[0m[0;34m
-[0m[0;34mlast
+[0m[0;34m****
+[0m[1;31m
+Start test 99[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+W[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - ip correlation rule'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.5, number=4000008449433403, region=EAP, date=2022-01-22T17:13:00]
+[0m[0;34mResult is: ALLOWED
+[0m[0;34m****    {
+)[0m[0;34m      "result": "PROHIBITED",
+*[0m[0;34m      "info": "ip-correlation"
+[0m[0;34m    }
+[0m[0;34m****
+[0m[1;31m
+Start test 100[0m
+[0;34mTest case
+4[0m[0;34mTesting api: '/api/antifraud/stolencard'
+>[0m[0;34mExpectations: 'A card must be added to Black List'
+[0m[0;34m-----
+[0m[1;31m
+Start test 101[0m
+[0;34mTest case
+7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
+:[0m[0;34mExpectations: 'IP must be added to Black List'
+[0m[0;34m-----
+"[0m[0;34madding ip 192.168.1.5
+#[0m[0;34m*added ip 192.168.1.5+
+[0m[1;31m
+Start test 102[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+s[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - amount, card-number, ip, ip-correlation reasons'
+[0m[0;34m-----
+t[0m[0;34mtransaction[amount=2000, ip=192.168.1.5, number=4000008449433403, region=EAP, date=2022-01-22T17:14:00]
+"[0m[0;34mResult is: PROHIBITED
+[0m[0;34m****    {
+)[0m[0;34m      "result": "PROHIBITED",
+C[0m[0;34m      "info": "amount, card-number, ip, ip-correlation"
+[0m[0;34m    }
+[0m[0;34m****
+[0m[1;31m
+Start test 103[0m
+[0;34mTest case
+4[0m[0;34mTesting api: '/api/antifraud/stolencard'
+@[0m[0;34mExpectations: 'Card must be removed from Black List'
+[0m[0;34m-----
+[0m[1;31m
+Start test 104[0m
+[0;34mTest case
+7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
+>[0m[0;34mExpectations: 'IP must be removed from Black List'
+[0m[0;34m-----
+$[0m[0;34mremoving ip 192.168.1.5
+[0m[1;31m
+Start test 105[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+7[0m[0;34mExpectations: 'Transaction must be ALLOWED'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.2, number=4000008449433403, region=EAP, date=2022-01-21T17:10:00]
+[0m[0;34mResult is: ALLOWED
+[0m[1;31m
+Start test 106[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+7[0m[0;34mExpectations: 'Transaction must be ALLOWED'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.2, number=4000008449433403, region=ECA, date=2022-01-21T17:11:00]
+[0m[0;34mResult is: ALLOWED
+[0m[1;31m
+Start test 107[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+7[0m[0;34mExpectations: 'Transaction must be ALLOWED'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.2, number=4000008449433403, region=ECA, date=2022-01-21T17:12:00]
+[0m[0;34mResult is: ALLOWED
+[0m[1;31m
+Start test 108[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+b[0m[0;34mExpectations: 'Transaction must be MANUAL_PROCESSING due to - region correlation rule'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.2, number=4000008449433403, region=HIC, date=2022-01-21T17:13:00]
+[0m[0;34mResult is: ALLOWED
+[0m[0;34m****    {
+0[0m[0;34m      "result": "MANUAL_PROCESSING",
+.[0m[0;34m      "info": "region-correlation"
+[0m[0;34m    }
+[0m[0;34m****
+[0m[1;31m
+Start test 109[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+[[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - region correlation rule'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.2, number=4000008449433403, region=SSA, date=2022-01-21T17:14:00]
+[0m[0;34mResult is: ALLOWED
+[0m[0;34m****    {
+)[0m[0;34m      "result": "PROHIBITED",
+.[0m[0;34m      "info": "region-correlation"
+[0m[0;34m    }
+[0m[0;34m****
+[0m[1;31m
+Start test 110[0m
+[0;34mTest case
+4[0m[0;34mTesting api: '/api/antifraud/stolencard'
+>[0m[0;34mExpectations: 'A card must be added to Black List'
+[0m[0;34m-----
+[0m[1;31m
+Start test 111[0m
+[0;34mTest case
+7[0m[0;34mTesting api: '/api/antifraud/suspicious-ip'
+:[0m[0;34mExpectations: 'IP must be added to Black List'
+[0m[0;34m-----
+"[0m[0;34madding ip 192.168.1.2
+#[0m[0;34m*added ip 192.168.1.2+
+[0m[1;31m
+Start test 112[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+w[0m[0;34mExpectations: 'Transaction must be PROHIBITED due to - amount, card-number, ip, region-correlation reasons'
+[0m[0;34m-----
+s[0m[0;34mtransaction[amount=2000, ip=192.168.1.2, number=4000008449433403, region=SA, date=2022-01-21T17:15:00]
+"[0m[0;34mResult is: PROHIBITED
+[0m[0;34m****    {
+)[0m[0;34m      "result": "PROHIBITED",
+G[0m[0;34m      "info": "amount, card-number, ip, region-correlation"
+[0m[0;34m    }
+[0m[0;34m****
+[0m[1;31m
+Start test 113[0m
+[0;34mTest case
+4[0m[0;34mTesting api: '/api/antifraud/stolencard'
+@[0m[0;34mExpectations: 'Card must be removed from Black List'
+[0m[0;34m-----
+[0m[1;31m
+Start test 114[0m
+[0;34mTest case
+5[0m[0;34mTesting api: '/api/antifraud/transaction'
+^[0m[0;34mExpectations: 'Transaction must be MANUAL_PROCESSING due to - ip correlation rule'
+[0m[0;34m-----
+q[0m[0;34mtransaction[amount=1, ip=192.168.1.4, number=4000008449433403, region=EAP, date=2022-01-22T17:12:00]
+[0m[0;34mResult is: ALLOWED
+[0m[0;34m****    {
+0[0m[0;34m      "result": "MANUAL_PROCESSING",
+*[0m[0;34m      "info": "ip-correlation"
+[0m[0;34m    }
+[0m[0;34m****
 [0m
