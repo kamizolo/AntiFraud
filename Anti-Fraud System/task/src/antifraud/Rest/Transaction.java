@@ -4,6 +4,8 @@ import antifraud.Card.CardRepository;
 import antifraud.Card.StolenCard;
 import antifraud.Ip.IpRepository;
 import antifraud.Ip.SuspiciousIp;
+import antifraud.Transfer.Transfer;
+import antifraud.Transfer.TransferRepository;
 import antifraud.User.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,6 +34,9 @@ public class Transaction {
     IpRepository ipRepository;
     @Autowired
     CardRepository cardRepository;
+
+    @Autowired
+    TransferRepository transferRepository;
     String result = "";
     public String test(long amount) {
         if (amount <= 0) {
@@ -61,13 +67,23 @@ public class Transaction {
 
             boolean suspiciousIp = ipRepository.findIpByIp(request.ip).isPresent();
 
+            Transfer transfer = new Transfer();
+            transfer.setAmount(request.amount);
+            transfer.setIpAddress(request.ip);
+            transfer.setCardNumber(request.number);
+            transfer.setRegion(request.region);
+            transfer.setTransactionDate(LocalDateTime.parse(request.date));
+
+            Iterable<Transfer> users = transferRepository.findTransactionByCardNumberAndTransactionDateBetween(request.number, LocalDateTime.parse(request.date).minusHours(1), LocalDateTime.parse(request.date));
 
             if (Objects.equals(result, "BAD REQUEST")) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             else if (Objects.equals(result, "ALLOWED")) {
+                transferRepository.save(transfer);
                 return new ResponseEntity<String>(json.formatted(result, "none"), HttpStatus.OK);
             } else if (Objects.equals(result, "MANUAL_PROCESSING") && (!stolenCard && !suspiciousIp)) {
+                transferRepository.save(transfer);
                 return new ResponseEntity<>(json.formatted(result, "amount"), HttpStatus.OK);
             } else  {
 
@@ -92,6 +108,7 @@ public class Transaction {
                 if(info.charAt(info.length() -1) == ',') {
                     info.deleteCharAt(info.length() - 1);
                 }
+                transferRepository.save(transfer);
                 return new ResponseEntity<>(json.formatted("PROHIBITED", info.toString()), HttpStatus.OK);
             }
         } catch (Exception ignore) {
@@ -198,5 +215,5 @@ public class Transaction {
     record putCardRequest(String number) {}
     record putIpRequest(String ip) {}
 
-    record transaction(String amount, String ip, String number, String date) {}
+    record transaction(String amount, String ip, String number, String region, String date) {}
 }

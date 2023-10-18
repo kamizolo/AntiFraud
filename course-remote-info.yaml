@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://cogniterra.org/media/attachments/lesson/26277/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Thu, 12 Oct 2023 16:20:51 UTC"
+update_date: "Wed, 18 Oct 2023 09:37:48 UTC"
 stages:
   - id: 1161
     step: 18067
@@ -35,6 +35,10 @@ topics:
       theory_id: 20084
     - title: Data structures
       theory_id: 16927
+    - title: World Wide Web
+      theory_id: 6633
+    - title: HyperText Transfer Protocol
+      theory_id: 6569
     - title: "Write, compile, and run"
       theory_id: 3739
     - title: "JVM, JRE, and JDK"
@@ -43,14 +47,6 @@ topics:
       theory_id: 8977
     - title: Parameters and Options
       theory_id: 9746
-    - title: World Wide Web
-      theory_id: 6633
-    - title: HyperText Transfer Protocol
-      theory_id: 6569
-    - title: Introduction to Spring Boot
-      theory_id: 7944
-    - title: Getting started with Spring Boot
-      theory_id: 6336
     - title: Pseudocode
       theory_id: 15090
     - title: Pseudocode basics
@@ -59,6 +55,10 @@ topics:
       theory_id: 20922
     - title: Fixed-size array
       theory_id: 20078
+    - title: Introduction to Spring Boot
+      theory_id: 7944
+    - title: Getting started with Spring Boot
+      theory_id: 6336
     - title: Dynamic array
       theory_id: 5357
     - title: HTTP URL
@@ -137,6 +137,8 @@ topics:
       theory_id: 3507
     - title: Switch statement
       theory_id: 3504
+    - title: Web development
+      theory_id: 13931
     - title: Sizes and ranges
       theory_id: 3532
     - title: Type casting
@@ -177,8 +179,6 @@ topics:
       theory_id: 5076
     - title: External resources
       theory_id: 6216
-    - title: Web development
-      theory_id: 13931
     - title: Libraries
       theory_id: 8504
     - title: Frameworks

@@ -2185,6 +2185,12 @@ files:
   - name: src/antifraud/User/Roles.java
     visible: true
     learner_created: true
+  - name: src/antifraud/Transfer/Transfer.java
+    visible: true
+    learner_created: true
+  - name: src/antifraud/Transfer/TransferRepository.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/18071#comment
 status: Unchecked
 record: 18
