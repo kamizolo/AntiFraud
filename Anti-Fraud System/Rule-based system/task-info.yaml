@@ -2179,9 +2179,6 @@ files:
           List<SuspiciousIp> findAllByOrderByIdAsc();
       }
     learner_created: true
-  - name: src/antifraud/Ip/Regions.java
-    visible: true
-    learner_created: true
   - name: src/antifraud/User/Roles.java
     visible: true
     learner_created: true

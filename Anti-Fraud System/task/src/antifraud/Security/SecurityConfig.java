@@ -47,10 +47,11 @@ public class SecurityConfig {
                         .antMatchers(HttpMethod.POST, "/api/antifraud/suspicious-ip").hasRole("SUPPORT")
                         .antMatchers(HttpMethod.GET, "/api/antifraud/suspicious-ip").hasRole("SUPPORT")
                         .antMatchers(HttpMethod.DELETE, "/api/antifraud/suspicious-ip/*").hasRole("SUPPORT")
+                        .antMatchers(HttpMethod.PUT, "/api/antifraud/transaction").hasRole("SUPPORT")
+                        .antMatchers(HttpMethod.GET, "/api/antifraud/history/**").hasRole("SUPPORT")
 
                         .antMatchers(HttpMethod.POST, "/api/antifraud/transaction/**").hasRole("MERCHANT")
                         .antMatchers("/actuator/shutdown").permitAll()      // needs to run test
-                        .antMatchers(HttpMethod.GET, "/test").hasRole("USER")
                         .antMatchers("/h2-console/**").permitAll()
 
                 )
